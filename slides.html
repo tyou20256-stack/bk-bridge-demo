@@ -510,6 +510,31 @@
     justify-content: center;
   }
 
+  /* ── Page Nav ── */
+  .page-nav {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    display: flex;
+    gap: 6px;
+    z-index: 200;
+  }
+  .page-nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: color 0.15s, background 0.15s;
+  }
+  .page-nav a:hover, .page-nav a.current {
+    color: var(--accent);
+    background: rgba(99,102,241,0.1);
+  }
+
   /* ── Responsive ── */
   @media (max-width: 800px) {
     .slide { padding: 40px 24px; }
@@ -518,18 +543,31 @@
     .cards-2, .cards-3, .convo-row, .convo-row-3, .needs-grid, .needs-grid-3 { grid-template-columns: 1fr; }
     .vs-row { flex-direction: column; gap: 16px; }
     .vs-arrow { transform: rotate(90deg); }
-    .triangle-container { width: 320px; height: 300px; }
-    .arch-triangle { width: 320px; height: 160px; }
-    .summary-triangle { width: 300px; height: 180px; }
+    .triangle-container { width: 100%; max-width: 320px; height: 300px; }
+    .triangle-svg, .arch-triangle-svg, .summary-svg { width: 100%; height: 100%; }
+    .arch-triangle { width: 100%; max-width: 320px; height: 160px; }
+    .summary-triangle { width: 100%; max-width: 300px; height: 180px; }
+    .page-nav { top: 8px; right: 8px; }
+    .page-nav a { font-size: 0.65rem; padding: 2px 5px; }
+    .slide { padding-top: 50px; }
   }
 </style>
 </head>
 <body>
 
-<div class="deck" id="deck">
+<!-- Page Nav -->
+<nav class="page-nav" aria-label="サイトナビゲーション">
+  <a href="index.html">トップ</a>
+  <a href="demo.html">デモ</a>
+  <a href="slides.html" class="current">スライド</a>
+  <a href="analysis.html">分析</a>
+  <a href="settings.html">設定</a>
+</nav>
+
+<div class="deck" id="deck" role="region" aria-label="プレゼンテーション" aria-live="polite">
 
   <!-- ====== SLIDE 1: Title ====== -->
-  <div class="slide active" data-slide="0">
+  <div class="slide active" data-slide="0" role="tabpanel" aria-label="スライド1: タイトル">
     <div class="tag">BK AI Workplace</div>
     <h1>Bridge</h1>
     <p class="subtitle">
@@ -594,7 +632,7 @@
   </div>
 
   <!-- ====== SLIDE 2: Problem ====== -->
-  <div class="slide" data-slide="1">
+  <div class="slide" data-slide="1" role="tabpanel" aria-label="スライド2: 課題">
     <div class="tag">課題</div>
     <h2>同じプロジェクト、違う言語</h2>
     <div class="vs-row">
@@ -628,7 +666,7 @@
   </div>
 
   <!-- ====== SLIDE 3: Solution ====== -->
-  <div class="slide" data-slide="2">
+  <div class="slide" data-slide="2" role="tabpanel" aria-label="スライド3: 解決策">
     <div class="tag">解決策</div>
     <h2>Bridge が自動翻訳する</h2>
     <p class="subtitle">同じ質問、同じデータ、<strong style="color: var(--text);">相手に合った言葉</strong>で回答</p>
@@ -672,7 +710,7 @@
   </div>
 
   <!-- ====== SLIDE 4: Architecture ====== -->
-  <div class="slide" data-slide="3">
+  <div class="slide" data-slide="3" role="tabpanel" aria-label="スライド4: アーキテクチャ">
     <div class="tag">仕組み</div>
     <h2>システム構成</h2>
     <div class="arch">
@@ -717,7 +755,7 @@
   </div>
 
   <!-- ====== SLIDE 5: Features ====== -->
-  <div class="slide" data-slide="4">
+  <div class="slide" data-slide="4" role="tabpanel" aria-label="スライド5: 機能">
     <div class="tag">機能</div>
     <h2>3つのコア機能</h2>
     <div class="cards cards-3">
@@ -740,7 +778,7 @@
   </div>
 
   <!-- ====== SLIDE 6: Needs ====== -->
-  <div class="slide" data-slide="5">
+  <div class="slide" data-slide="5" role="tabpanel" aria-label="スライド6: ニーズ可視化">
     <div class="tag">ニーズ可視化</div>
     <h2>お互いが必要としていること</h2>
     <div style="display: flex; flex-direction: column; gap: 28px; width: 100%; max-width: 1200px;">
@@ -790,7 +828,7 @@
   </div>
 
   <!-- ====== SLIDE 7: API ====== -->
-  <div class="slide" data-slide="6">
+  <div class="slide" data-slide="6" role="tabpanel" aria-label="スライド7: API">
     <div class="tag">API</div>
     <h2>Bridge API エンドポイント</h2>
     <div class="cards cards-2" style="max-width: 900px;">
@@ -818,7 +856,7 @@
   </div>
 
   <!-- ====== SLIDE 8: Benefits ====== -->
-  <div class="slide" data-slide="7">
+  <div class="slide" data-slide="7" role="tabpanel" aria-label="スライド8: 効果">
     <div class="tag">効果</div>
     <h2>導入メリット</h2>
     <ul class="benefit-list">
@@ -846,7 +884,7 @@
   </div>
 
   <!-- ====== SLIDE 9: Summary ====== -->
-  <div class="slide" data-slide="8">
+  <div class="slide" data-slide="8" role="tabpanel" aria-label="スライド9: まとめ">
     <h1>Bridge</h1>
     <p class="subtitle" style="font-size: 1.5rem; color: var(--text); margin-bottom: 16px;">
       エンジニア・経営層・デザイナー<br>3者の言葉の壁をAIで取り除く
@@ -929,11 +967,11 @@
 </div>
 
 <!-- Navigation -->
-<div class="nav">
-  <button id="prev" aria-label="Previous">&#8592;</button>
-  <div class="dots" id="dots"></div>
-  <button id="next" aria-label="Next">&#8594;</button>
-</div>
+<nav class="nav" aria-label="スライドナビゲーション">
+  <button id="prev" aria-label="前のスライド">&#8592;</button>
+  <div class="dots" id="dots" role="tablist" aria-label="スライド一覧"></div>
+  <button id="next" aria-label="次のスライド">&#8594;</button>
+</nav>
 
 <script>
   const slides = document.querySelectorAll('.slide');

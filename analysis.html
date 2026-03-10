@@ -43,6 +43,31 @@
     transition: color 0.2s;
   }
   .back-link:hover { color: var(--accent3); }
+
+  /* ── Page Nav ── */
+  .page-nav {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    display: flex;
+    gap: 6px;
+    z-index: 200;
+  }
+  .page-nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: color 0.15s, background 0.15s;
+  }
+  .page-nav a:hover, .page-nav a.current {
+    color: var(--accent);
+    background: rgba(99,102,241,0.1);
+  }
   .tag {
     display: inline-block;
     background: rgba(99,102,241,0.15);
@@ -403,7 +428,16 @@
 </style>
 </head>
 <body>
-<div class="container">
+<!-- Page Nav -->
+<nav class="page-nav" aria-label="サイトナビゲーション">
+  <a href="index.html">トップ</a>
+  <a href="demo.html">デモ</a>
+  <a href="slides.html">スライド</a>
+  <a href="analysis.html" class="current">分析</a>
+  <a href="settings.html">設定</a>
+</nav>
+
+<div class="container" role="main">
   <a href="index.html" class="back-link">&larr; Back</a>
 
   <div class="tag">BK AI Workplace</div>

@@ -412,20 +412,131 @@
   }
   body { padding-top: 28px; }
 
+  /* ── Page Nav ── */
+  .page-nav {
+    position: fixed;
+    top: 28px;
+    right: 16px;
+    display: flex;
+    gap: 6px;
+    z-index: 999;
+  }
+  .page-nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: color 0.15s, background 0.15s;
+  }
+  .page-nav a:hover, .page-nav a.current {
+    color: var(--accent);
+    background: rgba(99,102,241,0.1);
+  }
+
+  /* ── Mobile hamburger ── */
+  .hamburger {
+    display: none;
+    position: fixed;
+    top: 34px;
+    left: 12px;
+    z-index: 1001;
+    background: var(--sidebar);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    align-items: center;
+    justify-content: center;
+  }
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 998;
+  }
+  .sidebar-overlay.show { display: block; }
+
+  /* ── Settings indicator ── */
+  .settings-indicator {
+    margin: 8px 12px;
+    padding: 8px 12px;
+    background: rgba(99,102,241,0.08);
+    border: 1px solid rgba(99,102,241,0.15);
+    border-radius: 8px;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .settings-indicator .si-title {
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 0.74rem;
+  }
+  .settings-indicator .si-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin-top: 4px;
+  }
+  .settings-indicator .si-tag {
+    background: rgba(99,102,241,0.12);
+    color: var(--accent);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.65rem;
+    font-weight: 600;
+  }
+  .settings-indicator a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.7rem;
+  }
+  .settings-indicator a:hover { text-decoration: underline; }
+
   /* ── Responsive ── */
   @media (max-width: 1100px) { .panel { display: none; } }
   @media (max-width: 768px) {
-    .sidebar { display: none; }
+    .hamburger { display: flex; }
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 999;
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+    }
+    .sidebar.open { transform: translateX(0); }
     .msg.ai .bubble { max-width: 100%; }
+    .page-nav { top: 34px; right: 8px; }
+    .page-nav a { font-size: 0.65rem; padding: 2px 5px; }
   }
 </style>
 </head>
 <body>
 
-<div class="demo-banner">DEMO — ロール切替で同じ情報が経営層・エンジニア・デザイナーにどう翻訳されるかを確認できます</div>
+<div class="demo-banner" role="banner">DEMO — ロール切替で同じ情報が経営層・エンジニア・デザイナーにどう翻訳されるかを確認できます</div>
+
+<!-- Page Nav -->
+<nav class="page-nav" aria-label="サイトナビゲーション">
+  <a href="index.html">トップ</a>
+  <a href="demo.html" class="current">デモ</a>
+  <a href="slides.html">スライド</a>
+  <a href="analysis.html">分析</a>
+  <a href="settings.html">設定</a>
+</nav>
+
+<!-- Mobile hamburger -->
+<button class="hamburger" id="hamburgerBtn" aria-label="メニューを開く">☰</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <!-- ── Sidebar ── -->
-<div class="sidebar">
+<div class="sidebar" id="sidebar" role="complementary" aria-label="サイドバー">
   <div class="sidebar-header">
     <div class="logo">B</div>
     <div class="name">BK AI Workplace<small>Bridge v1.1</small></div>
@@ -442,6 +553,11 @@
     <div class="chat-item">リリース予定の確認</div>
     <div class="chat-item">開発チームへのリソース要求</div>
   </div>
+  <div class="settings-indicator" id="settingsIndicator" style="display:none;">
+    <div class="si-title">⚙️ 設定反映中</div>
+    <div id="settingsDetail"></div>
+    <a href="settings.html">設定を変更 →</a>
+  </div>
   <div class="sidebar-footer" id="sidebarFooter">
     <div class="avatar" id="userAvatar">KK</div>
     <div class="user-info">
@@ -455,10 +571,10 @@
 <div class="main">
   <div class="chat-header">
     <h2 id="chatTitle">bk-pay-match の進捗確認</h2>
-    <div class="role-tabs" id="roleTabs">
-      <button class="role-tab active" data-role="management">💼 経営層</button>
-      <button class="role-tab" data-role="engineer">💻 エンジニア</button>
-      <button class="role-tab" data-role="designer">🎨 デザイナー</button>
+    <div class="role-tabs" id="roleTabs" role="tablist" aria-label="ロール切替">
+      <button class="role-tab active" data-role="management" role="tab" aria-selected="true" aria-label="経営層ビュー">💼 経営層</button>
+      <button class="role-tab" data-role="engineer" role="tab" aria-selected="false" aria-label="エンジニアビュー">💻 エンジニア</button>
+      <button class="role-tab" data-role="designer" role="tab" aria-selected="false" aria-label="デザイナービュー">🎨 デザイナー</button>
     </div>
   </div>
 
@@ -1265,8 +1381,107 @@
   sendBtn.addEventListener('click', send);
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') send(); });
 
+  // ── aria-selected update on tab switch ──
+  const origTabClick = roleTabs.onclick;
+  roleTabs.addEventListener('click', () => {
+    roleTabs.querySelectorAll('.role-tab').forEach(t => {
+      t.setAttribute('aria-selected', t.classList.contains('active') ? 'true' : 'false');
+    });
+  });
+
+  // ── Keyboard navigation for role tabs ──
+  roleTabs.addEventListener('keydown', (e) => {
+    const tabs = Array.from(roleTabs.querySelectorAll('.role-tab'));
+    const idx = tabs.indexOf(document.activeElement);
+    if (idx === -1) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      const next = tabs[(idx + 1) % tabs.length];
+      next.focus();
+      next.click();
+    }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const prev = tabs[(idx - 1 + tabs.length) % tabs.length];
+      prev.focus();
+      prev.click();
+    }
+  });
+
+  // ── Mobile hamburger ──
+  const hamburger = document.getElementById('hamburgerBtn');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+
+  hamburger.addEventListener('click', () => {
+    const isOpen = sidebar.classList.toggle('open');
+    overlay.classList.toggle('show', isOpen);
+    hamburger.setAttribute('aria-label', isOpen ? 'メニューを閉じる' : 'メニューを開く');
+    hamburger.textContent = isOpen ? '✕' : '☰';
+  });
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+    hamburger.setAttribute('aria-label', 'メニューを開く');
+    hamburger.textContent = '☰';
+  });
+
+  // ── Settings integration ──
+  function loadSettingsForRole(role) {
+    const map = { management: 'management', engineer: 'engineer', designer: 'designer' };
+    const raw = localStorage.getItem('bridge-settings-' + map[role]);
+    if (!raw) {
+      document.getElementById('settingsIndicator').style.display = 'none';
+      return;
+    }
+    const data = JSON.parse(raw);
+    const indicator = document.getElementById('settingsIndicator');
+    const detail = document.getElementById('settingsDetail');
+    let html = '';
+
+    if (role === 'engineer') {
+      const stack = data['eng-stack-tags'] || [];
+      const infra = data['eng-infra-tags'] || [];
+      if (stack.length || infra.length) {
+        html += '<div class="si-tags">';
+        stack.concat(infra).forEach(t => { html += '<span class="si-tag">' + t + '</span>'; });
+        html += '</div>';
+      }
+      if (data['eng-repo']) html += '<div style="margin-top:3px;">Repo: ' + data['eng-repo'].split('/').slice(-1)[0] + '</div>';
+    } else if (role === 'designer') {
+      if (data['des-figma-url']) html += '<div>Figma連携済み</div>';
+      const tools = data['des-tools-tags'] || [];
+      if (tools.length) {
+        html += '<div class="si-tags">';
+        tools.forEach(t => { html += '<span class="si-tag">' + t + '</span>'; });
+        html += '</div>';
+      }
+    } else {
+      const kpis = data['mng-kpi-tags'] || [];
+      if (kpis.length) {
+        html += '<div class="si-tags">';
+        kpis.forEach(t => { html += '<span class="si-tag">' + t + '</span>'; });
+        html += '</div>';
+      }
+      if (data['mng-goal']) html += '<div style="margin-top:3px;">目標: ' + data['mng-goal'] + '</div>';
+    }
+
+    if (html) {
+      detail.innerHTML = html;
+      indicator.style.display = 'block';
+    } else {
+      indicator.style.display = 'none';
+    }
+  }
+
+  // Update settings when role changes
+  const origRoleClick = roleTabs.addEventListener('click', () => loadSettingsForRole(currentRole));
+
   // Scroll to bottom on load
   document.getElementById('management-messages').scrollTop = document.getElementById('management-messages').scrollHeight;
+
+  // Initial settings load
+  loadSettingsForRole('management');
 </script>
 
 </body>
