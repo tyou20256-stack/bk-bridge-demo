@@ -139,7 +139,7 @@
     position: relative;
   }
   .speech::before {
-    content: '"';
+    content: '\201C';
     font-size: 2rem;
     color: var(--accent);
     position: absolute;
@@ -389,6 +389,127 @@
     margin-bottom: 12px;
   }
 
+  /* ── Triangle Layout (Slide 1) ── */
+  .triangle-container {
+    position: relative;
+    width: 480px;
+    height: 420px;
+    margin-top: 16px;
+  }
+  .triangle-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+  }
+  .triangle-vertex {
+    position: absolute;
+    z-index: 10;
+  }
+  .triangle-vertex.top {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .triangle-vertex.bottom-left {
+    bottom: 0;
+    left: 0;
+  }
+  .triangle-vertex.bottom-right {
+    bottom: 0;
+    right: 0;
+  }
+  /* SVG arrows layer */
+  .triangle-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  /* ── Architecture Triangle (Slide 4) ── */
+  .arch-triangle {
+    position: relative;
+    width: 500px;
+    height: 200px;
+    margin-bottom: 8px;
+  }
+  .arch-triangle .arch-box {
+    position: absolute;
+  }
+  .arch-triangle .arch-box.a-top {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .arch-triangle .arch-box.a-left {
+    bottom: 0;
+    left: 0;
+  }
+  .arch-triangle .arch-box.a-right {
+    bottom: 0;
+    right: 0;
+  }
+  .arch-triangle-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  /* ── Summary Triangle (Slide 9) ── */
+  .summary-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    max-width: 700px;
+    width: 100%;
+  }
+  .summary-triangle {
+    position: relative;
+    width: 400px;
+    height: 220px;
+  }
+  .summary-triangle .s-node {
+    position: absolute;
+    z-index: 10;
+  }
+  .summary-triangle .s-top {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .summary-triangle .s-left {
+    bottom: 0;
+    left: 0;
+  }
+  .summary-triangle .s-right {
+    bottom: 0;
+    right: 0;
+  }
+  .summary-triangle .s-center {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .summary-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+  .summary-stack {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
   /* ── Responsive ── */
   @media (max-width: 800px) {
     .slide { padding: 40px 24px; }
@@ -397,6 +518,9 @@
     .cards-2, .cards-3, .convo-row, .convo-row-3, .needs-grid, .needs-grid-3 { grid-template-columns: 1fr; }
     .vs-row { flex-direction: column; gap: 16px; }
     .vs-arrow { transform: rotate(90deg); }
+    .triangle-container { width: 320px; height: 300px; }
+    .arch-triangle { width: 320px; height: 160px; }
+    .summary-triangle { width: 300px; height: 180px; }
   }
 </style>
 </head>
@@ -412,39 +536,58 @@
       エンジニア・経営層・デザイナーが<br>
       お互いの言葉で理解し合えるAIプラットフォーム
     </p>
-    <div style="margin-top: 24px; display: flex; flex-direction: column; align-items: center; gap: 0;">
-      <!-- Top: Bridge AI center -->
-      <div class="flow-box highlight" style="margin-bottom: 20px;">
-        <div style="font-size:1.6rem;">🤖</div>
-        <div style="font-weight:600;">Bridge AI</div>
-        <div class="label">三者間自動翻訳</div>
-      </div>
-      <!-- Triangle: 3 roles connected -->
-      <div style="display: flex; align-items: flex-start; gap: 32px; flex-wrap: wrap; justify-content: center;">
+    <div class="triangle-container">
+      <!-- SVG connection lines with arrows -->
+      <svg class="triangle-svg" viewBox="0 0 480 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow1" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#6366f1" opacity="0.7"/>
+          </marker>
+          <marker id="arrow1r" markerWidth="8" markerHeight="6" refX="1" refY="3" orient="auto">
+            <polygon points="8 0, 0 3, 8 6" fill="#6366f1" opacity="0.7"/>
+          </marker>
+        </defs>
+        <!-- Edge: Top (経営層) ↔ Bottom-Left (エンジニア) -->
+        <line x1="200" y1="80" x2="95" y2="330" stroke="#6366f1" stroke-width="2" opacity="0.5" marker-end="url(#arrow1)" marker-start="url(#arrow1r)"/>
+        <!-- Edge: Top (経営層) ↔ Bottom-Right (デザイナー) -->
+        <line x1="280" y1="80" x2="385" y2="330" stroke="#6366f1" stroke-width="2" opacity="0.5" marker-end="url(#arrow1)" marker-start="url(#arrow1r)"/>
+        <!-- Edge: Bottom-Left (エンジニア) ↔ Bottom-Right (デザイナー) -->
+        <line x1="150" y1="370" x2="330" y2="370" stroke="#6366f1" stroke-width="2" opacity="0.5" marker-end="url(#arrow1)" marker-start="url(#arrow1r)"/>
+        <!-- Center lines: Bridge to each vertex -->
+        <line x1="240" y1="195" x2="240" y2="80" stroke="#ec4899" stroke-width="1.5" opacity="0.35" stroke-dasharray="4 4"/>
+        <line x1="225" y1="215" x2="100" y2="345" stroke="#ec4899" stroke-width="1.5" opacity="0.35" stroke-dasharray="4 4"/>
+        <line x1="255" y1="215" x2="380" y2="345" stroke="#ec4899" stroke-width="1.5" opacity="0.35" stroke-dasharray="4 4"/>
+      </svg>
+      <!-- Top vertex: 経営層 -->
+      <div class="triangle-vertex top">
         <div class="flow-box" style="border-color: var(--accent2);">
           <div style="font-size:1.6rem;">💼</div>
           <div style="font-weight:600;">経営層</div>
           <div class="label">ビジネス語</div>
         </div>
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 18px;">
-          <span style="color:var(--accent); font-size: 0.8rem;">&#10231;</span>
-          <span style="color:var(--accent); font-size: 0.8rem;">&#10231;</span>
-          <span style="color:var(--accent); font-size: 0.8rem;">&#10231;</span>
-        </div>
+      </div>
+      <!-- Bottom-left vertex: エンジニア -->
+      <div class="triangle-vertex bottom-left">
         <div class="flow-box" style="border-color: var(--accent3);">
           <div style="font-size:1.6rem;">💻</div>
           <div style="font-weight:600;">エンジニア</div>
           <div class="label">技術語</div>
         </div>
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 18px;">
-          <span style="color:var(--accent); font-size: 0.8rem;">&#10231;</span>
-          <span style="color:var(--accent); font-size: 0.8rem;">&#10231;</span>
-          <span style="color:var(--accent); font-size: 0.8rem;">&#10231;</span>
-        </div>
+      </div>
+      <!-- Bottom-right vertex: デザイナー -->
+      <div class="triangle-vertex bottom-right">
         <div class="flow-box" style="border-color: var(--green);">
           <div style="font-size:1.6rem;">🎨</div>
           <div style="font-weight:600;">デザイナー</div>
           <div class="label">デザイン語</div>
+        </div>
+      </div>
+      <!-- Center: Bridge AI -->
+      <div class="triangle-center">
+        <div class="flow-box highlight" style="padding: 22px 28px;">
+          <div style="font-size:1.8rem;">🤖</div>
+          <div style="font-weight:700; font-size:1.1rem;">Bridge AI</div>
+          <div class="label">三者間自動翻訳</div>
         </div>
       </div>
     </div>
@@ -533,14 +676,24 @@
     <div class="tag">仕組み</div>
     <h2>システム構成</h2>
     <div class="arch">
-      <div class="arch-row">
-        <div class="arch-box" style="border-color: var(--accent2);">💼 経営層<small>Open WebUI</small></div>
-        <div class="arch-line" style="flex: 1; height: 2px; background: linear-gradient(90deg, var(--accent2), var(--accent3)); border-radius: 1px;"></div>
-        <div class="arch-box" style="border-color: var(--accent3);">💻 エンジニア<small>Open WebUI</small></div>
-        <div class="arch-line" style="flex: 1; height: 2px; background: linear-gradient(90deg, var(--accent3), var(--green)); border-radius: 1px;"></div>
-        <div class="arch-box" style="border-color: var(--green);">🎨 デザイナー<small>Open WebUI</small></div>
+      <!-- Triangle of 3 user roles -->
+      <div class="arch-triangle">
+        <svg class="arch-triangle-svg" viewBox="0 0 500 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Lines between the 3 roles -->
+          <line x1="250" y1="45" x2="75" y2="165" stroke="#6366f1" stroke-width="1.5" opacity="0.3"/>
+          <line x1="250" y1="45" x2="425" y2="165" stroke="#6366f1" stroke-width="1.5" opacity="0.3"/>
+          <line x1="120" y1="175" x2="380" y2="175" stroke="#6366f1" stroke-width="1.5" opacity="0.3"/>
+        </svg>
+        <div class="arch-box a-top" style="border-color: var(--accent2);">💼 経営層<small>Open WebUI</small></div>
+        <div class="arch-box a-left" style="border-color: var(--accent3);">💻 エンジニア<small>Open WebUI</small></div>
+        <div class="arch-box a-right" style="border-color: var(--green);">🎨 デザイナー<small>Open WebUI</small></div>
       </div>
-      <div class="arch-line">&#8595;</div>
+      <!-- Down arrows from all 3 -->
+      <div style="display: flex; gap: 100px; justify-content: center; color: var(--muted); font-size: 1.2rem;">
+        <span>&#8600;</span>
+        <span>&#8595;</span>
+        <span>&#8601;</span>
+      </div>
       <div class="arch-row">
         <div class="arch-box core" style="min-width: 280px;">
           🤖 <strong>Pipeline</strong> — ロール自動判定<small>ユーザーのグループから経営層/エンジニア/デザイナーの3ロールを識別</small>
@@ -671,23 +824,23 @@
     <ul class="benefit-list">
       <li>
         <span class="num">1</span>
-        <span class="text"><strong>意思決定の加速</strong> — 技術報告を待たず、経営層がリアルタイムでプロジェクト状況を把握。判断に必要な情報がビジネス語で即座に届く。</span>
+        <span class="text"><strong>意思決定の加速</strong> — 技術報告・デザイン承認を待たず、経営層がリアルタイムでプロジェクト状況を把握。判断に必要な情報がビジネス語で即座に届く。デザイナーも実装状況をデザイン語で確認でき、承認フローが高速化。</span>
       </li>
       <li>
         <span class="num">2</span>
-        <span class="text"><strong>報告コストの削減</strong> — エンジニアが経営向け報告書を手作業で作る時間をゼロに。AIがデータから自動生成。</span>
+        <span class="text"><strong>報告コストの削減</strong> — エンジニアが経営向け報告書を手作業で作る時間をゼロに。デザイナーのハンドオフ報告（実装差分・コンポーネント進捗）もAIがデータから自動生成。三者間の報告がすべて自動化。</span>
       </li>
       <li>
         <span class="num">3</span>
-        <span class="text"><strong>ミスコミュニケーション防止</strong> — 「技術的負債」「MTTR」などの専門用語を相手が理解できる言葉に自動変換。認識のズレを解消。</span>
+        <span class="text"><strong>ミスコミュニケーション防止</strong> — 技術用語「技術的負債」「MTTR」をビジネス語に、デザイン用語「コンポーネント」→「画面パーツ」、「トークン」→「デザイン規格」のように三者間の専門用語を相手が理解できる言葉に自動変換。認識のズレを解消。</span>
       </li>
       <li>
         <span class="num">4</span>
-        <span class="text"><strong>ニーズの見える化</strong> — お互いが何を求めているか、データに基づいて自動分析。会議前に論点が明確になる。</span>
+        <span class="text"><strong>ニーズの見える化</strong> — 経営層・エンジニア・デザイナーの三者がお互いに何を求めているか、データに基づいて自動分析。会議前に論点が明確になる。</span>
       </li>
       <li>
         <span class="num">5</span>
-        <span class="text"><strong>既存インフラに統合</strong> — Jira / GitHub / DevLake の既存データを活用。新しいツール学習不要。チャットで聞くだけ。</span>
+        <span class="text"><strong>既存インフラに統合</strong> — Jira / GitHub / DevLake / Figma の既存データを活用。新しいツール学習不要。チャットで聞くだけ。</span>
       </li>
     </ul>
   </div>
@@ -698,32 +851,77 @@
     <p class="subtitle" style="font-size: 1.5rem; color: var(--text); margin-bottom: 16px;">
       エンジニア・経営層・デザイナー<br>3者の言葉の壁をAIで取り除く
     </p>
-    <p class="subtitle" style="margin-bottom: 40px;">
+    <p class="subtitle" style="margin-bottom: 32px;">
       同じデータ、同じプラットフォーム。<br>
       それぞれの言語で、お互いを理解する。
     </p>
-    <div class="flow">
-      <div class="flow-box" style="border-color: var(--green); background: rgba(74,222,128,0.08);">
-        <div style="font-weight:600; color: var(--green);">Open WebUI</div>
-        <div class="label">チャットUI</div>
+    <div class="summary-layout">
+      <!-- Triangle showing 3-way relationship -->
+      <div class="summary-triangle">
+        <svg class="summary-svg" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow2" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
+              <polygon points="0 0, 6 2.5, 0 5" fill="#6366f1" opacity="0.6"/>
+            </marker>
+            <marker id="arrow2r" markerWidth="6" markerHeight="5" refX="1" refY="2.5" orient="auto">
+              <polygon points="6 0, 0 2.5, 6 5" fill="#6366f1" opacity="0.6"/>
+            </marker>
+          </defs>
+          <!-- Triangle edges -->
+          <line x1="200" y1="40" x2="60" y2="180" stroke="#6366f1" stroke-width="1.5" opacity="0.4" marker-end="url(#arrow2)" marker-start="url(#arrow2r)"/>
+          <line x1="200" y1="40" x2="340" y2="180" stroke="#6366f1" stroke-width="1.5" opacity="0.4" marker-end="url(#arrow2)" marker-start="url(#arrow2r)"/>
+          <line x1="100" y1="195" x2="300" y2="195" stroke="#6366f1" stroke-width="1.5" opacity="0.4" marker-end="url(#arrow2)" marker-start="url(#arrow2r)"/>
+          <!-- Center dashed lines -->
+          <line x1="200" y1="110" x2="200" y2="45" stroke="#ec4899" stroke-width="1" opacity="0.3" stroke-dasharray="3 3"/>
+          <line x1="190" y1="120" x2="70" y2="185" stroke="#ec4899" stroke-width="1" opacity="0.3" stroke-dasharray="3 3"/>
+          <line x1="210" y1="120" x2="330" y2="185" stroke="#ec4899" stroke-width="1" opacity="0.3" stroke-dasharray="3 3"/>
+        </svg>
+        <!-- Top: 経営層 -->
+        <div class="s-node s-top">
+          <div class="flow-box" style="border-color: var(--accent2); padding: 10px 16px;">
+            <div style="font-weight:600; color: var(--accent2); font-size: 0.9rem;">💼 経営層</div>
+          </div>
+        </div>
+        <!-- Bottom-left: エンジニア -->
+        <div class="s-node s-left">
+          <div class="flow-box" style="border-color: var(--accent3); padding: 10px 16px;">
+            <div style="font-weight:600; color: var(--accent3); font-size: 0.9rem;">💻 エンジニア</div>
+          </div>
+        </div>
+        <!-- Bottom-right: デザイナー -->
+        <div class="s-node s-right">
+          <div class="flow-box" style="border-color: var(--green); padding: 10px 16px;">
+            <div style="font-weight:600; color: var(--green); font-size: 0.9rem;">🎨 デザイナー</div>
+          </div>
+        </div>
+        <!-- Center: Bridge -->
+        <div class="s-node s-center">
+          <div class="flow-box highlight" style="padding: 10px 18px;">
+            <div style="font-weight:700; font-size: 0.95rem;">🤖 Bridge</div>
+          </div>
+        </div>
       </div>
-      <div class="flow-arrow">+</div>
-      <div class="flow-box" style="border-color: var(--accent); background: rgba(99,102,241,0.08);">
-        <div style="font-weight:600; color: var(--accent);">Bridge API</div>
-        <div class="label">データ + AI翻訳</div>
-      </div>
-      <div class="flow-arrow">+</div>
-      <div class="flow-box" style="border-color: var(--orange); background: rgba(251,146,60,0.08);">
-        <div style="font-weight:600; color: var(--orange);">DevLake</div>
-        <div class="label">Jira + GitHub</div>
-      </div>
-      <div class="flow-arrow">+</div>
-      <div class="flow-box" style="border-color: var(--green); background: rgba(74,222,128,0.08);">
-        <div style="font-weight:600; color: var(--green);">Figma</div>
-        <div class="label">コンポーネント + コメント</div>
+      <!-- Tech stack row -->
+      <div class="summary-stack">
+        <div class="flow-box" style="border-color: var(--green); background: rgba(74,222,128,0.08); padding: 12px 16px;">
+          <div style="font-weight:600; color: var(--green); font-size: 0.85rem;">Open WebUI</div>
+          <div class="label">チャットUI</div>
+        </div>
+        <div class="flow-box" style="border-color: var(--accent); background: rgba(99,102,241,0.08); padding: 12px 16px;">
+          <div style="font-weight:600; color: var(--accent); font-size: 0.85rem;">Bridge API</div>
+          <div class="label">データ + AI翻訳</div>
+        </div>
+        <div class="flow-box" style="border-color: var(--orange); background: rgba(251,146,60,0.08); padding: 12px 16px;">
+          <div style="font-weight:600; color: var(--orange); font-size: 0.85rem;">DevLake</div>
+          <div class="label">Jira + GitHub</div>
+        </div>
+        <div class="flow-box" style="border-color: var(--green); background: rgba(74,222,128,0.08); padding: 12px 16px;">
+          <div style="font-weight:600; color: var(--green); font-size: 0.85rem;">Figma</div>
+          <div class="label">コンポーネント</div>
+        </div>
       </div>
     </div>
-    <p style="margin-top: 40px; font-size: 0.85rem; color: var(--muted);">
+    <p style="margin-top: 32px; font-size: 0.85rem; color: var(--muted);">
       BK AI Workplace &mdash; Bridge v1.1
     </p>
   </div>

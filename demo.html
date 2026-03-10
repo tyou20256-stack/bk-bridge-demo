@@ -232,6 +232,27 @@
     border-radius: 3px;
     margin-left: 4px;
   }
+  .msg.ai .bubble .translation-box {
+    background: rgba(99,102,241,0.08);
+    border-left: 3px solid var(--accent);
+    padding: 10px 14px;
+    margin: 8px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.88rem;
+  }
+  .msg.ai .bubble .translation-box .from {
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+  .msg.ai .bubble .translation-box .arrow {
+    color: var(--accent);
+    font-weight: 700;
+    margin: 4px 0;
+  }
+  .msg.ai .bubble .translation-box .to {
+    color: var(--text);
+    font-weight: 600;
+  }
 
   /* ── Typing indicator ── */
   .typing { display: flex; gap: 4px; padding: 8px 0; }
@@ -401,7 +422,7 @@
 </head>
 <body>
 
-<div class="demo-banner">DEMO — ロール切替で経営層・エンジニア・デザイナーの異なる体験を確認できます</div>
+<div class="demo-banner">DEMO — ロール切替で同じ情報が経営層・エンジニア・デザイナーにどう翻訳されるかを確認できます</div>
 
 <!-- ── Sidebar ── -->
 <div class="sidebar">
@@ -460,6 +481,18 @@
           <li><strong>スプリント進捗: </strong>Sprint 12 — <span class="metric">75%消化</span>（残り4日）</li>
         </ul>
 
+        <h3>🌉 エンジニアからの報告を翻訳</h3>
+        <div class="translation-box">
+          <div class="from">💻 エンジニアの原文: 「PR #156がマージ待ち、CI red で BK-89 がブロックされてる」</div>
+          <div class="arrow">↓ あなた向けに翻訳</div>
+          <div class="to">決済機能のコア部分は開発完了済みですが、確認作業（コードレビュー）が承認待ちのまま2日間停止中です。この承認がないと後続3タスクに着手できません。</div>
+        </div>
+        <div class="translation-box">
+          <div class="from">🎨 デザイナーの原文: 「Figmaコメント3件未解決、トークンJSON化が未着手」</div>
+          <div class="arrow">↓ あなた向けに翻訳</div>
+          <div class="to">UIの細部仕様が3箇所未確定です。また、デザインの色・余白ルールをエンジニアが使える形式に変換する作業（工数1日）が未承認で、承認すれば開発効率が20%向上します。</div>
+        </div>
+
         <h3>⚠️ 注意が必要な項目</h3>
         <ul>
           <li><span class="critical">要判断</span> <strong>決済機能のコード確認が承認待ち</strong> — 2日間停滞中。<strong>2日以内の判断</strong>がないとリリースに影響</li>
@@ -470,13 +503,6 @@
         <ul>
           <li>今月のAI利用コスト: <span class="metric">$1,200 / $2,000 予算</span>（60%消化）</li>
           <li>開発リソース: 4名稼働中（計画通り）</li>
-        </ul>
-
-        <h3>🎨 デザイン状況</h3>
-        <ul>
-          <li>UIコンポーネント完成率: <span class="metric">85% (42/50)</span></li>
-          <li>エンジニアへのハンドオフ待ち: <span class="warn">5コンポーネント</span></li>
-          <li>Figma未解決コメント: 3件</li>
         </ul>
 
         <h3>📋 経営判断が必要な事項</h3>
@@ -502,8 +528,12 @@
         <h3>🚧 ブロッカー詳細</h3>
 
         <h3>1. 決済機能の承認待ち <span class="critical">経営判断が必要</span></h3>
+        <div class="translation-box">
+          <div class="from">💻 エンジニアの報告: 「PR #156、DB migration に breaking change あり、staging 検証が必要。feature flag で段階適用も検討中」</div>
+          <div class="arrow">↓ 経営層向けに翻訳</div>
+          <div class="to">決済処理のコア機能は完成していますが、データベース構造の変更を伴うため慎重な確認が必要です。開発チームは段階的に適用する安全策も準備済み。あなたの承認で即日開発再開できます。</div>
+        </div>
         <ul>
-          <li><strong>内容:</strong> 決済処理のコア機能が開発完了し、技術確認（レビュー）待ちの状態</li>
           <li><strong>停滞期間:</strong> 2日間</li>
           <li><strong>影響:</strong> この承認がないと後続の3つのタスクに着手できない</li>
           <li><strong>解消見込み:</strong> 承認後 <span class="ok">即日〜1日</span> で開発再開可能</li>
@@ -511,8 +541,12 @@
         </ul>
 
         <h3>2. 外部決済API仕様 <span class="warn">パートナー依存</span></h3>
+        <div class="translation-box">
+          <div class="from">💻 エンジニアの報告: 「/v2/payments のリクエスト形式が未定義。OpenAPI spec ドラフトベースで interface 定義してモックで開発継続中」</div>
+          <div class="arrow">↓ 経営層向けに翻訳</div>
+          <div class="to">連携先の決済サービスからAPI仕様書の最終版が届いていません。エンジニアチームは仮の仕様で開発を進めていますが、最終仕様が届かないと本実装に移れません。</div>
+        </div>
         <ul>
-          <li><strong>内容:</strong> 連携先の決済サービスからAPI仕様書の最終版が届いていない</li>
           <li><strong>停滞期間:</strong> 5日間</li>
           <li><strong>影響:</strong> 決済連携機能の実装開始が遅延</li>
           <li><strong>解消見込み:</strong> 仕様確定後 <span class="warn">3〜5営業日</span> で実装完了</li>
@@ -535,43 +569,55 @@
       <div class="bubble">チームが今求めていることは？</div>
     </div>
 
-    <!-- Message 6: AI (Needs Analysis) -->
+    <!-- Message 6: AI (Needs Analysis with translations) -->
     <div class="msg ai">
       <div class="ai-avatar">🤖</div>
       <div class="bubble">
-        <h3>🤝 ニーズ分析 — bk-pay-match</h3>
+        <h3>🤝 ニーズ分析 — 各ロールの言葉を経営言語に翻訳</h3>
 
-        <h3>💼 エンジニアチームが経営層に求めていること</h3>
+        <h3>💻 エンジニアチームが経営層に求めていること</h3>
+        <div class="translation-box">
+          <div class="from">💻 エンジニアの原文: 「PR #156 のレビューが2日間放置されてて、BK-89 と BK-91, BK-95 が全部ブロックされてる。誰かシニアにレビューアサインして」</div>
+          <div class="arrow">↓ 経営言語に翻訳</div>
+          <div class="to"><span class="critical">最優先</span> 決済機能レビューの承認判断 — 開発メンバー2名の手が止まっており、1日あたり約$800の機会損失が発生中</div>
+        </div>
+        <div class="translation-box">
+          <div class="from">💻 エンジニアの原文: 「技術的負債がヤバい。暫定対応のコードが溜まりすぎてて新機能の velocity が20%落ちてる。2スプリントくれればリファクタできる」</div>
+          <div class="arrow">↓ 経営言語に翻訳</div>
+          <div class="to">過去の暫定対応が蓄積し、新機能の開発速度が20%低下。2スプリント（4週間）の改善投資で回復見込み。ROI: 3ヶ月で投資回収</div>
+        </div>
         <ul>
-          <li><span class="critical">最優先</span> <strong>決済機能レビューの承認判断</strong> — 2日間ブロック中。開発メンバー2名の手が止まっている</li>
           <li><span class="warn">高</span> <strong>外部パートナーへのエスカレーション</strong> — API仕様の遅延を経営レベルで解決してほしい</li>
-          <li><strong>技術的負債の解消に2スプリント</strong> — 過去の暫定対応が蓄積し、新機能の開発速度が20%低下。改善投資を承認してほしい</li>
           <li><strong>QA環境のサーバー増強</strong> — テスト実行時間が長くなりリリース前検証がボトルネックに</li>
         </ul>
 
-        <h3>💼 経営層がエンジニアチームに求めていること</h3>
-        <ul>
-          <li><strong>週次進捗レポートの精度向上</strong> — 完了率だけでなくリスクの早期共有（→ Bridge が自動化済み）</li>
-          <li><strong>コスト見通しの提示</strong> — AI利用コストが予算の60%に達しており、月末着地見込みの報告</li>
-          <li><strong>リリース日の確約</strong> — クライアントへの案内に必要</li>
-        </ul>
-
         <h3>🎨 デザインチームが経営層に求めていること</h3>
+        <div class="translation-box">
+          <div class="from">🎨 デザイナーの原文: 「LP配色のカラーパレットがステークホルダーレビューで止まってて、今のまま進めると手戻りが発生する。ブランドガイドラインとの整合性を確認してほしい」</div>
+          <div class="arrow">↓ 経営言語に翻訳</div>
+          <div class="to"><strong>ブランド方針の確定</strong> — LP配色の最終承認が出ておらず、承認遅延1日あたりデザイン手戻りリスクが増大。今週中の判断を推奨</div>
+        </div>
         <ul>
-          <li><strong>ブランド方針の確定</strong> — LP配色の最終承認が出ておらず、デザイン作業が手戻りリスク</li>
           <li><strong>ユーザーリサーチ予算</strong> — ユーザビリティテスト未実施。投資判断を求めている</li>
         </ul>
 
-        <h3>💻 エンジニア ↔ 🎨 デザイナー 相互ニーズ</h3>
-        <ul>
-          <li><span class="warn">エンジニア→デザイナー:</span> <strong>レスポンシブのブレイクポイント定義</strong>とデザイントークンのJSON化</li>
-          <li><span class="warn">デザイナー→エンジニア:</span> <strong>実装精度のフィードバック</strong>とデザインQAへの参加</li>
-        </ul>
+        <h3>💻 エンジニア ↔ 🎨 デザイナー 相互ニーズ（Bridge が双方を翻訳）</h3>
+        <div class="translation-box">
+          <div class="from">💻 エンジニア→デザイナー: 「レスポンシブの breakpoint 定義が Figma に入ってない。768px と 1024px でどうレイアウト変えるか決めてくれないと mediaクエリ書けない」</div>
+          <div class="arrow">↓ デザイナー向けに翻訳済み</div>
+          <div class="to">「スマホ(768px以下)とタブレット(1024px以下)でのレイアウト変更パターンをFigmaに追加してほしい」</div>
+        </div>
+        <div class="translation-box">
+          <div class="from">🎨 デザイナー→エンジニア: 「デザインQAで見たら、Figmaで指定したスペーシングとフォントサイズが実装で全然違う。トークン化してないのが原因」</div>
+          <div class="arrow">↓ エンジニア向けに翻訳済み</div>
+          <div class="to">「Figma の Design Tokens を JSON エクスポートして、CSS 変数の自動生成パイプラインを組めば実装ズレが解消する」</div>
+        </div>
 
         <h3>💡 Bridge の提案</h3>
         <ul>
           <li>ブロッカー #1 を今日中に解消すれば、チームの生産性が<strong>即座に回復</strong></li>
           <li>技術的負債への2スプリント投資は、中期的に開発速度<strong>20%改善</strong>（ROI: 3ヶ月で回収見込み）</li>
+          <li>デザイントークンJSON化の承認で、エンジニア↔デザイナー間の摩擦が<strong>大幅に削減</strong></li>
         </ul>
 
         <div class="source">データソース: <span>Issues</span> <span>Pull Requests</span> <span>Sprints</span> <span>AI分析</span> <span>Figma Comments</span></div>
@@ -595,8 +641,20 @@
           <li><strong>PRレビュー待ち:</strong> #156 (2日), #159 (1日), #163 (本日)</li>
           <li><strong>DORA指標:</strong> デプロイ頻度 <span class="ok">3.2回/週 (↑12%)</span>, MTTR <span class="metric">2.1h</span></li>
           <li><strong>CI/CD:</strong> 最終パイプライン成功、テストカバレッジ <span class="metric">82%</span></li>
-          <li><strong>デザインハンドオフ:</strong> <span class="warn">5コンポーネント</span>がFigmaで完成 → 実装待ち。デザイントークン未JSON化でCSS変数手動定義中</li>
         </ul>
+
+        <h3>🌉 他ロールの状況をエンジニア向けに翻訳</h3>
+        <div class="translation-box">
+          <div class="from">💼 経営層の発言: 「コスト予算の60%消化、月末超過リスクあり」</div>
+          <div class="arrow">↓ 技術アクションに翻訳</div>
+          <div class="to">LiteLLM の model routing で定型レビューを claude-haiku に切替。Langfuse でコスト/トークン量をモニタリングして閾値アラート設定。</div>
+        </div>
+        <div class="translation-box">
+          <div class="from">🎨 デザイナーの発言: 「5コンポーネントがFigmaで完成、ハンドオフ待ち。トークンJSON化が未実施」</div>
+          <div class="arrow">↓ 技術アクションに翻訳</div>
+          <div class="to">Figma のハンドオフ5件を Issue 化して Sprint 12 に追加。Design Tokens は Style Dictionary で JSON→CSS変数の自動生成パイプラインを構築（工数0.5日）。</div>
+        </div>
+
         <div class="source">データソース: <span>Issues</span> <span>Pull Requests</span> <span>CICD Deployments</span> <span>Figma</span></div>
       </div>
     </div>
@@ -608,18 +666,81 @@
     <div class="msg ai">
       <div class="ai-avatar">🤖</div>
       <div class="bubble">
-        <h3>💡 「コスト削減」の技術的アクション</h3>
+        <h3>💡 経営の「コスト削減」を技術アクションに翻訳</h3>
+        <div class="translation-box">
+          <div class="from">💼 経営層の原文: 「AI利用コストが予算の60%に到達。月末超過リスクがあるのでコスト削減してほしい」</div>
+          <div class="arrow">↓ 技術タスクに翻訳</div>
+          <div class="to">LiteLLM の model_list で定型タスクのルーティング先を変更 + キャッシュ戦略の見直し</div>
+        </div>
+
+        <h3>🔧 具体的な技術アクション</h3>
         <ul>
-          <li><strong>経営層の意図:</strong> AI利用コストが予算の<span class="warn">60%</span>に到達、月末超過リスク</li>
+          <li><strong>1. claude-haiku への切替</strong> — <code>litellm_config.yaml</code> の model_list で、定型コードレビュー・ドキュメント生成を haiku にルーティング → <span class="ok">月$400削減見込み</span></li>
+          <li><strong>2. レスポンスキャッシュ設定</strong> — LiteLLM の cache TTL を 3600s に設定。同一プロンプトの重複コールを排除 → <span class="ok">月$150削減見込み</span></li>
+          <li><strong>3. 未使用staging環境の停止</strong> — <code>docker-compose.staging.yml</code> の不要サービスを down → <span class="ok">月$150削減見込み</span></li>
+          <li><strong>4. Langfuse でコスト監視</strong> — トークン使用量ダッシュボードに日次アラート（閾値: $80/日）を追加</li>
         </ul>
 
-        <h3>🔧 技術的対策</h3>
+        <h3>📊 削減効果サマリー</h3>
         <ul>
-          <li><strong>定型レビューを claude-haiku に切替</strong> → <span class="ok">月$400削減見込み</span></li>
-          <li><strong>不要なAPIコール削減:</strong> キャッシュTTL設定見直し</li>
-          <li><strong>インフラ:</strong> 未使用のstaging環境を停止 → <span class="ok">月$150削減</span></li>
+          <li>合計削減見込み: <span class="ok">月$700</span>（現在$1,200 → $500/月に圧縮）</li>
+          <li>月末着地予測: <span class="ok">$1,400</span>（予算$2,000内に収まる）</li>
         </ul>
+
         <div class="source">データソース: <span>LiteLLM</span> <span>Langfuse</span> <span>AI Analysis</span></div>
+      </div>
+    </div>
+
+    <!-- Message 5: NEW - 3rd conversation -->
+    <div class="msg user">
+      <div class="bubble">経営が「コスト削減してUIも改善して」って言ってるけど、何すればいい？</div>
+    </div>
+
+    <div class="msg ai">
+      <div class="ai-avatar">🤖</div>
+      <div class="bubble">
+        <h3>🌉 経営 + デザイナーの要望を技術アクションに三方向翻訳</h3>
+        <p>経営の「コスト削減してUIも改善して」には、実は経営とデザイナー両方の要望が混ざっています。分解して翻訳します。</p>
+
+        <h3>1. 経営の「コスト削減」→ 技術アクション</h3>
+        <div class="translation-box">
+          <div class="from">💼 経営の原文: 「コスト削減してほしい」</div>
+          <div class="arrow">↓ 技術タスクに翻訳</div>
+          <div class="to">
+            - <code>litellm_config.yaml</code>: 定型レビューの model を claude-haiku に切替 → 月$400削減<br>
+            - LiteLLM cache TTL=3600s 設定 → 重複コール排除で月$150削減<br>
+            - staging環境の不要コンテナ停止 → 月$150削減
+          </div>
+        </div>
+
+        <h3>2. 経営の「UI改善」→ デザイナーの要望 → 技術アクション</h3>
+        <div class="translation-box">
+          <div class="from">💼 経営の原文: 「UI改善して」</div>
+          <div class="arrow">↓ デザイナーはこう解釈している</div>
+          <div class="to">🎨 「デザイントークンをJSON化して、Figmaで定義した色・余白・フォントがそのまま実装に反映されるようにしたい」</div>
+        </div>
+        <div class="translation-box">
+          <div class="from">🎨 デザイナーの要望: 「デザイントークンJSON化」</div>
+          <div class="arrow">↓ 技術タスクに翻訳</div>
+          <div class="to">Style Dictionary を導入して、Figma Design Tokens → JSON → CSS変数の自動生成パイプラインを構築。<code>tokens.json</code> → <code>style-dictionary build</code> → <code>variables.css</code> を CI に組み込む。工数: 0.5日</div>
+        </div>
+
+        <h3>3. デザイナーの不満 → 技術アクション</h3>
+        <div class="translation-box">
+          <div class="from">🎨 デザイナーの原文: 「レスポンシブの定義が無視されてる。Figmaで指定したブレイクポイントが実装に反映されてない」</div>
+          <div class="arrow">↓ 技術タスクに翻訳</div>
+          <div class="to">Figma のブレイクポイント定義（768px / 1024px）を CSS <code>@media</code> クエリに反映。現状ハードコードされてる breakpoint を Design Token から読む形に統一。対象ファイル: <code>responsive.css</code>, <code>layout.module.css</code></div>
+        </div>
+
+        <h3>📋 まとめ: やること一覧</h3>
+        <ul>
+          <li><span class="metric">P0</span> LiteLLM model routing 変更（haiku切替） — 0.5日</li>
+          <li><span class="metric">P0</span> Style Dictionary パイプライン構築 — 0.5日</li>
+          <li><span class="metric">P1</span> CSS breakpoint をトークンベースに統一 — 0.5日</li>
+          <li><span class="metric">P2</span> キャッシュ・staging最適化 — 0.5日</li>
+        </ul>
+
+        <div class="source">データソース: <span>LiteLLM</span> <span>Langfuse</span> <span>Figma Tokens</span> <span>AI Analysis</span></div>
       </div>
     </div>
   </div>
@@ -644,9 +765,20 @@
             </ul>
           </li>
           <li><strong>エンジニアハンドオフ状況:</strong> <span class="warn">5コンポーネント実装待ち</span></li>
-          <li><strong>経営層承認待ち:</strong> <span class="critical">LP配色の最終方針</span>が未確定 — 手戻りリスクあり</li>
-          <li><strong>開発チームとの連携:</strong> Sprint 12で実装される5コンポーネントの<span class="ok">デザインQA</span>を今週予定</li>
         </ul>
+
+        <h3>🌉 他ロールの状況をデザイナー向けに翻訳</h3>
+        <div class="translation-box">
+          <div class="from">💼 経営層の発言: 「コンバージョン率を上げたい。ブランドカラーの一貫性を保ちたい」</div>
+          <div class="arrow">↓ デザインアクションに翻訳</div>
+          <div class="to">LP上部のCTAボタンの視認性を上げるデザイン案を作成。全ページでカラーパレットの統一を確認して、スタイルガイドに反映してください。</div>
+        </div>
+        <div class="translation-box">
+          <div class="from">💻 エンジニアの発言: 「Design Token が JSON化されてないから CSS変数を手動定義してる。ブレイクポイントの mediaクエリも仕様がなくて勘で書いてる」</div>
+          <div class="arrow">↓ デザインアクションに翻訳</div>
+          <div class="to">Figma のデザイントークン（色、余白、フォントサイズ）をJSON形式でエクスポートしてください。また、レスポンシブのブレイクポイント（768px, 1024px）での各コンポーネントのレイアウト変更パターンをFigmaに追加してください。</div>
+        </div>
+
         <div class="source">データソース: <span>Figma Components</span> <span>Figma Comments</span> <span>Issues</span></div>
       </div>
     </div>
@@ -658,25 +790,74 @@
     <div class="msg ai">
       <div class="ai-avatar">🤖</div>
       <div class="bubble">
-        <h3>💡 デザイン観点のニーズ分析</h3>
+        <h3>💡 経営・エンジニアの要望をデザイン言語に翻訳</h3>
 
         <h3>💼 経営層→デザイナー</h3>
-        <ul>
-          <li><strong>コンバージョン率向上</strong>のためLP上部のCTAボタンを目立たせたい</li>
-          <li><strong>ブランドカラーの一貫性</strong>を全ページで保ちたい</li>
-        </ul>
+        <div class="translation-box">
+          <div class="from">💼 経営の原文: 「コンバージョン率を向上させたい」</div>
+          <div class="arrow">↓ デザインタスクに翻訳</div>
+          <div class="to">LP上部のCTAボタンのサイズ・配色・配置を再検討。現在のコントラスト比は十分だが、ファーストビューでの視認性をA/Bテスト可能な2パターンで作成してください。</div>
+        </div>
+        <div class="translation-box">
+          <div class="from">💼 経営の原文: 「ブランドカラーの一貫性を全ページで保ちたい」</div>
+          <div class="arrow">↓ デザインタスクに翻訳</div>
+          <div class="to">全ページのカラー使用箇所を監査して、ブランドガイドラインとの差分をリスト化。デザイントークンとして定義すれば、エンジニア実装でもブレが防げます。</div>
+        </div>
 
         <h3>💻 エンジニア→デザイナー</h3>
-        <ul>
-          <li><strong>レスポンシブのブレイクポイント定義</strong>が欲しい (768px, 1024px)</li>
-          <li><strong>デザイントークン</strong> (色コード、余白、フォントサイズ) をJSON化してほしい</li>
-        </ul>
+        <div class="translation-box">
+          <div class="from">💻 エンジニアの原文: 「breakpoint の定義がないから @media (max-width: 768px) の中身を勘で書いてる」</div>
+          <div class="arrow">↓ デザインタスクに翻訳</div>
+          <div class="to">スマホ(768px以下)・タブレット(1024px以下)での各コンポーネントのレイアウト変更パターンをFigmaに追加してほしい。特にナビゲーション、カード配置、フォームの並び方。</div>
+        </div>
+        <div class="translation-box">
+          <div class="from">💻 エンジニアの原文: 「Design Token を JSON で出してくれれば CSS変数の自動生成パイプライン組める」</div>
+          <div class="arrow">↓ デザインタスクに翻訳</div>
+          <div class="to">Figma の Styles をトークンとしてJSONエクスポートしてください（色24、余白12、フォント18）。1日の作業で、以降のデザイン→実装のズレが自動的に解消されます。</div>
+        </div>
 
         <h3>🌉 Bridge提案</h3>
         <ul>
-          <li>デザインシステムのトークンJSON化は工数<span class="metric">1日</span>で開発効率<span class="ok">20%向上</span>見込み</li>
+          <li>デザインシステムのトークンJSON化は工数<span class="metric">1日</span>で、エンジニア側の実装工数<span class="ok">20%削減</span> + デザインQAの手戻り<span class="ok">大幅削減</span></li>
+          <li>レスポンシブ定義の追加で、エンジニアとの認識ズレが解消 → Figmaコメントの往復が減る</li>
         </ul>
         <div class="source">データソース: <span>Figma Components</span> <span>Figma Comments</span> <span>Issues</span> <span>AI Analysis</span></div>
+      </div>
+    </div>
+
+    <!-- Message 5: NEW - 3rd conversation -->
+    <div class="msg user">
+      <div class="bubble">エンジニアが「実装できない」って言ってるパーツがあるらしいけど、何のこと？</div>
+    </div>
+
+    <div class="msg ai">
+      <div class="ai-avatar">🤖</div>
+      <div class="bubble">
+        <h3>🌉 エンジニアの技術制約をデザイン言語に翻訳</h3>
+        <p>エンジニアが「実装できない」と言っているのは、正確には「特定のブラウザ環境で表示が崩れる」という技術制約です。翻訳します。</p>
+
+        <h3>1. CSS Grid レイアウトの制約</h3>
+        <div class="translation-box">
+          <div class="from">💻 エンジニアの原文: 「CSS Grid の subgrid が IE11 で未対応。ProductGrid と PricingTable で display:grid の 3カラムが崩れる。@supports で fallback 書くか、Grid 使わないレイアウトに変えるか決めてほしい」</div>
+          <div class="arrow">↓ デザイナー向けに翻訳</div>
+          <div class="to">対象ブラウザ（IE11）では、3カラムの均等割りレイアウトが使えません。代替案として<strong>「2カラム + スタック」のフォールバックデザイン</strong>が必要です。<br><br>影響コンポーネント:<br>- <strong>ProductGrid</strong>: 3列→2列+スタックの代替案を用意してください<br>- <strong>PricingTable</strong>: 横並び3プラン→縦スクロール式の代替案を用意してください</div>
+        </div>
+
+        <h3>2. リリース前倒しによるスコープ調整</h3>
+        <div class="translation-box">
+          <div class="from">💼 経営の原文: 「リリースを前倒しできないか」<br>💻 エンジニアの解釈: 「残り8コンポーネントのうち5つを今スプリントで実装するのは無理。3つを次スプリントに回す提案をしたい」</div>
+          <div class="arrow">↓ デザイナー向けに翻訳</div>
+          <div class="to">リリース前倒しのため、残り8コンポーネントのうち<strong>3つを次スプリントに後回し</strong>にする提案が出ています。<br><br>今スプリントで優先実装するもの（デザインQA対象）:<br>- <span class="critical">P0</span> <strong>CheckoutFlow</strong> — 決済の核心UI<br>- <span class="critical">P0</span> <strong>PaymentForm</strong> — カード入力フォーム<br>- <span class="warn">P1</span> <strong>ErrorState</strong> — エラー画面（ユーザー離脱防止に直結）<br><br>次スプリントに回すもの:<br>- モーダル(2), ページネーション(1)<br><br>上記3コンポーネントのデザインQAを<strong>今週中に優先して</strong>進めてください。</div>
+        </div>
+
+        <h3>📋 デザイナーのアクション</h3>
+        <ul>
+          <li><span class="critical">今日〜明日</span> ProductGrid, PricingTable の2カラムフォールバック案を作成</li>
+          <li><span class="warn">今週中</span> CheckoutFlow, PaymentForm, ErrorState のデザインQA</li>
+          <li><span class="metric">今週中</span> 優先コンポーネントのレスポンシブ定義（768px/1024px）を追加</li>
+        </ul>
+
+        <div class="source">データソース: <span>Issues</span> <span>Pull Requests</span> <span>Figma Components</span> <span>AI Analysis</span></div>
       </div>
     </div>
   </div>
@@ -805,10 +986,12 @@
 <li><strong>月末見込み:</strong> <span class="warn">$1,850〜$2,100</span></li>
 <li><strong>最多利用:</strong> コードレビュー支援（45%）、ドキュメント生成（30%）</li>
 </ul>
-<h3>💡 コスト最適化の提案</h3>
-<ul>
-<li>定型的なコードレビューは軽量モデル（Haiku）に切替 → <span class="ok">月$400削減見込み</span></li>
-</ul>
+<h3>🌉 エンジニアの提案を翻訳</h3>
+<div class="translation-box">
+<div class="from">💻 エンジニアの提案: 「LiteLLM の model routing で定型レビューを haiku に切替、cache TTL 設定」</div>
+<div class="arrow">↓ 経営言語に翻訳</div>
+<div class="to">AI処理の種類に応じて安価なモデルを自動選択する仕組みに変更。品質を保ちながら月$400のコスト削減が可能です。承認のみで即実行できます。</div>
+</div>
 <div class="source">データソース: <span>LiteLLM</span> <span>Langfuse</span></div>`,
     'リリース': `<h3>📅 リリース予定</h3>
 <ul>
@@ -824,6 +1007,29 @@
 <li>3月21日: 本番リリース</li>
 </ul>
 <div class="source">データソース: <span>Issues</span> <span>Sprints</span></div>`,
+    '翻訳': `<h3>🌉 三方向翻訳の例 — 「リリース遅延リスク」を各ロールの言語で</h3>
+<p>同じ「リリース遅延リスク」という情報を、Bridge は各ロールの言語に翻訳して届けています。</p>
+<h3>💼 経営層が見ている情報（今あなたが見ているもの）</h3>
+<ul>
+<li>「決済機能の承認が2日間停滞中。今週中に判断しないとリリースが1週間遅延」</li>
+<li>「パートナーAPI仕様の遅延で、開発コストが日あたり$800増加中」</li>
+</ul>
+<h3>💻 同じ情報をエンジニアが見ると</h3>
+<div class="translation-box">
+<div class="from">エンジニア向け翻訳:</div>
+<div class="to">「PR #156 が2日間レビュー待ち。BK-89, BK-91, BK-95 がブロック中。feature flag で migration 段階適用を検討。BK-102 は OpenAPI spec ドラフトベースで interface 定義して mock 開発を継続」</div>
+</div>
+<h3>🎨 同じ情報をデザイナーが見ると</h3>
+<div class="translation-box">
+<div class="from">デザイナー向け翻訳:</div>
+<div class="to">「開発が停滞しているため、CheckoutFlow, PaymentForm, ErrorState のデザインQAを今週中に優先してください。残り8コンポーネントのうち3つが次スプリントに後回しになる可能性があります」</div>
+</div>
+<h3>💡 これが Bridge の価値</h3>
+<ul>
+<li>同じデータソースから、<strong>ロールに最適化された言語</strong>で情報を届ける</li>
+<li>各ロールが自分の専門領域で<strong>即座にアクション可能な形</strong>に変換</li>
+</ul>
+<div class="source">データソース: <span>Issues</span> <span>Pull Requests</span> <span>Figma</span> <span>AI Analysis</span></div>`,
   };
 
   const engineerResponses = {
@@ -836,11 +1042,12 @@
 <li><span class="critical">BK-89</span> <strong>DB migration依存</strong> — PR #156 のレビュー待ち（2日）。migration スクリプトに breaking change あり、staging で検証必要</li>
 <li><span class="warn">BK-102</span> <strong>外部API仕様未確定</strong> — エンドポイント /v2/payments のリクエスト形式が未定義。モックで開発継続中</li>
 </ul>
-<h3>💡 回避策</h3>
-<ul>
-<li>BK-89: feature flag で migration を段階適用する方法を検討中</li>
-<li>BK-102: OpenAPI spec のドラフトをベースに interface 定義済み</li>
-</ul>
+<h3>🌉 経営の反応を翻訳</h3>
+<div class="translation-box">
+<div class="from">💼 経営の反応: 「ブロッカーの解消見込みと、リリースへの影響を教えて」</div>
+<div class="arrow">↓ 技術的に翻訳</div>
+<div class="to">経営はリリース日の確約を求めている。PR #156 の承認を今週中に得られるよう、レビュー依頼の escalation path を使うことを推奨。BK-102 は経営レベルでパートナーに催促する方向で動いている。</div>
+</div>
 <div class="source">データソース: <span>Issues</span> <span>Pull Requests</span></div>`,
     'CI': `<h3>🔄 CI/CDパイプライン状況</h3>
 <ul>
@@ -864,6 +1071,27 @@
 <li>エラーハンドリングのエッジケース</li>
 </ul>
 <div class="source">データソース: <span>GitHub Actions</span> <span>Jest Coverage</span></div>`,
+    'デザイン': `<h3>🌉 デザイナーの要望を技術タスクに翻訳</h3>
+<p>デザイナーチームからの要望を、実装可能な技術タスクに翻訳します。</p>
+<h3>🎨→💻 翻訳1: デザイントークン</h3>
+<div class="translation-box">
+<div class="from">🎨 デザイナーの原文: 「Figmaで定義したスペーシングとフォントサイズが実装で全然違う。デザインQAのたびに修正が入る」</div>
+<div class="arrow">↓ 技術タスクに翻訳</div>
+<div class="to">Style Dictionary を導入。Figma Tokens Plugin → JSON エクスポート → <code>style-dictionary build</code> → CSS変数自動生成。CI に組み込めば Figma 更新時に自動で CSS が更新される。工数: 0.5日</div>
+</div>
+<h3>🎨→💻 翻訳2: レスポンシブ</h3>
+<div class="translation-box">
+<div class="from">🎨 デザイナーの原文: 「スマホ版のレイアウトが指定と違う。フッターが横並びのままになってる」</div>
+<div class="arrow">↓ 技術タスクに翻訳</div>
+<div class="to">Figma のブレイクポイント定義（768px/1024px）を <code>@media</code> クエリに反映。具体的には <code>responsive.css</code> の footer セクションで <code>flex-direction: column</code> に切替。デザイントークンから breakpoint 値を読む形に統一。</div>
+</div>
+<h3>🎨→💻 翻訳3: ブラウザ対応</h3>
+<div class="translation-box">
+<div class="from">🎨 デザイナーの原文: 「ProductGrid の3カラムレイアウトを崩さないでほしい」</div>
+<div class="arrow">↓ 技術的制約を説明</div>
+<div class="to">IE11 で CSS Grid subgrid が未対応のため、<code>@supports</code> で fallback を書く必要がある。デザイナーに2カラム+スタックのフォールバック案を依頼済み。</div>
+</div>
+<div class="source">データソース: <span>Figma Comments</span> <span>Issues</span> <span>AI Analysis</span></div>`,
   };
 
   const designerResponses = {
@@ -901,6 +1129,27 @@
 <li>トークンJSON化 → エンジニアのCSS変数自動生成で<span class="ok">実装工数20%削減</span></li>
 </ul>
 <div class="source">データソース: <span>Figma Styles</span> <span>AI Analysis</span></div>`,
+    'エンジニア': `<h3>🌉 エンジニアの技術制約をデザイン言語に翻訳</h3>
+<p>エンジニアチームが共有している技術的な制約を、デザインアクションに翻訳します。</p>
+<h3>💻→🎨 翻訳1: レイアウト制約</h3>
+<div class="translation-box">
+<div class="from">💻 エンジニアの原文: 「CSS Grid の subgrid が IE11 で未対応。ProductGrid で display:grid の 3カラムが崩れる」</div>
+<div class="arrow">↓ デザイナー向けに翻訳</div>
+<div class="to">対象ブラウザでは3カラム均等割りが使えません。ProductGrid と PricingTable について、<strong>2カラム+縦スタック</strong>のフォールバック案を作成してください。</div>
+</div>
+<h3>💻→🎨 翻訳2: 実装精度</h3>
+<div class="translation-box">
+<div class="from">💻 エンジニアの原文: 「Design Token が JSON化されてないから、Figma 見ながら手動で CSS 書いてる。毎回微妙にズレる」</div>
+<div class="arrow">↓ デザイナー向けに翻訳</div>
+<div class="to">FigmaのデザイントークンをJSONでエクスポートすれば、エンジニア側で自動変換できるようになり、デザインとのズレが解消されます。Figma Tokens Plugin で1日の作業です。</div>
+</div>
+<h3>💻→🎨 翻訳3: アニメーション</h3>
+<div class="translation-box">
+<div class="from">💻 エンジニアの原文: 「Figma の Smart Animate で定義されてるトランジション、duration と easing の値が書かれてなくてCSSに落とせない」</div>
+<div class="arrow">↓ デザイナー向けに翻訳</div>
+<div class="to">Figma のアニメーション定義に、duration（例: 200ms）と easing（例: ease-in-out）の数値を明記してください。これがないとエンジニアがCSSアニメーションを正確に再現できません。</div>
+</div>
+<div class="source">データソース: <span>Issues</span> <span>Figma Comments</span> <span>AI Analysis</span></div>`,
   };
 
   const allResponses = {
