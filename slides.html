@@ -412,35 +412,40 @@
       エンジニア・経営層・デザイナーが<br>
       お互いの言葉で理解し合えるAIプラットフォーム
     </p>
-    <div style="margin-top: 24px; display: flex; flex-direction: column; align-items: center; gap: 16px;">
-      <!-- Top: Engineer and Designer -->
-      <div class="flow" style="justify-content: center;">
-        <div class="flow-box" style="border-color: var(--accent3);">
-          <div style="font-size:1.6rem;">💻</div>
-          <div style="font-weight:600;">エンジニア</div>
-          <div class="label">技術語</div>
-        </div>
-        <div class="flow-arrow">&#10230;</div>
-        <div class="flow-box highlight">
-          <div style="font-size:1.6rem;">🤖</div>
-          <div style="font-weight:600;">Bridge AI</div>
-          <div class="label">自動翻訳</div>
-        </div>
-        <div class="flow-arrow">&#10230;</div>
+    <div style="margin-top: 24px; display: flex; flex-direction: column; align-items: center; gap: 0;">
+      <!-- Top: Bridge AI center -->
+      <div class="flow-box highlight" style="margin-bottom: 20px;">
+        <div style="font-size:1.6rem;">🤖</div>
+        <div style="font-weight:600;">Bridge AI</div>
+        <div class="label">三者間自動翻訳</div>
+      </div>
+      <!-- Triangle: 3 roles connected -->
+      <div style="display: flex; align-items: flex-start; gap: 32px; flex-wrap: wrap; justify-content: center;">
         <div class="flow-box" style="border-color: var(--accent2);">
           <div style="font-size:1.6rem;">💼</div>
           <div style="font-weight:600;">経営層</div>
           <div class="label">ビジネス語</div>
         </div>
-      </div>
-      <!-- Bottom: Designer connected to Bridge -->
-      <div style="display: flex; align-items: center; gap: 16px;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 18px;">
+          <span style="color:var(--accent); font-size: 0.8rem;">&#10231;</span>
+          <span style="color:var(--accent); font-size: 0.8rem;">&#10231;</span>
+          <span style="color:var(--accent); font-size: 0.8rem;">&#10231;</span>
+        </div>
+        <div class="flow-box" style="border-color: var(--accent3);">
+          <div style="font-size:1.6rem;">💻</div>
+          <div style="font-weight:600;">エンジニア</div>
+          <div class="label">技術語</div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 18px;">
+          <span style="color:var(--accent); font-size: 0.8rem;">&#10231;</span>
+          <span style="color:var(--accent); font-size: 0.8rem;">&#10231;</span>
+          <span style="color:var(--accent); font-size: 0.8rem;">&#10231;</span>
+        </div>
         <div class="flow-box" style="border-color: var(--green);">
           <div style="font-size:1.6rem;">🎨</div>
           <div style="font-weight:600;">デザイナー</div>
           <div class="label">デザイン語</div>
         </div>
-        <div class="flow-arrow">&#10230; Bridge &#10230;</div>
       </div>
     </div>
   </div>
@@ -585,29 +590,45 @@
   <div class="slide" data-slide="5">
     <div class="tag">ニーズ可視化</div>
     <h2>お互いが必要としていること</h2>
-    <div class="needs-grid-3">
-      <div class="needs-col">
-        <h3 style="color: var(--accent2);">💼 経営層 → エンジニアに求めること</h3>
-        <div class="need-item"><span class="dot pink"></span>進捗の可視性（完了率・遅延リスク）</div>
-        <div class="need-item"><span class="dot pink"></span>リソース配分の妥当性</div>
-        <div class="need-item"><span class="dot pink"></span>納期予測の精度</div>
-        <div class="need-item"><span class="dot pink"></span>コスト対効果の説明</div>
-        <div class="need-item"><span class="dot pink"></span>リスクの早期警告</div>
+    <div style="display: flex; flex-direction: column; gap: 28px; width: 100%; max-width: 1200px;">
+      <!-- Pair 1: 経営層 ↔ エンジニア -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="needs-col">
+          <h3 style="color: var(--accent2); font-size: 1rem;">💼 経営層 → 💻 エンジニア</h3>
+          <div class="need-item"><span class="dot pink"></span>進捗の可視性（完了率・遅延リスク）</div>
+          <div class="need-item"><span class="dot pink"></span>納期予測とコスト対効果</div>
+        </div>
+        <div class="needs-col">
+          <h3 style="color: var(--accent3); font-size: 1rem;">💻 エンジニア → 💼 経営層</h3>
+          <div class="need-item"><span class="dot cyan"></span>優先度の明確化と根拠</div>
+          <div class="need-item"><span class="dot cyan"></span>ブロッカー解除の意思決定</div>
+        </div>
       </div>
-      <div class="needs-col">
-        <h3 style="color: var(--accent3);">💻 エンジニア → 経営層に求めること</h3>
-        <div class="need-item"><span class="dot cyan"></span>優先度の明確化と根拠</div>
-        <div class="need-item"><span class="dot cyan"></span>ブロッカー解除の意思決定</div>
-        <div class="need-item"><span class="dot cyan"></span>リソース（人員・ツール・予算）</div>
-        <div class="need-item"><span class="dot cyan"></span>技術的負債への投資承認</div>
-        <div class="need-item"><span class="dot cyan"></span>仕様の確定・スコープ決定</div>
+      <!-- Pair 2: 経営層 ↔ デザイナー -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="needs-col">
+          <h3 style="color: var(--accent2); font-size: 1rem;">💼 経営層 → 🎨 デザイナー</h3>
+          <div class="need-item"><span class="dot pink"></span>ブランド一貫性の担保</div>
+          <div class="need-item"><span class="dot pink"></span>コンバージョン改善のUI最適化</div>
+        </div>
+        <div class="needs-col">
+          <h3 style="color: var(--green); font-size: 1rem;">🎨 デザイナー → 💼 経営層</h3>
+          <div class="need-item"><span class="dot green"></span>ブランド方針の承認</div>
+          <div class="need-item"><span class="dot green"></span>ユーザーリサーチ予算</div>
+        </div>
       </div>
-      <div class="needs-col">
-        <h3 style="color: var(--green);">🎨 デザイナー → チームに求めること</h3>
-        <div class="need-item"><span class="dot green"></span>実装精度のフィードバック</div>
-        <div class="need-item"><span class="dot green"></span>デザインQAへの参加</div>
-        <div class="need-item"><span class="dot green"></span>ブランド方針の承認</div>
-        <div class="need-item"><span class="dot green"></span>ユーザーリサーチ予算</div>
+      <!-- Pair 3: エンジニア ↔ デザイナー -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="needs-col">
+          <h3 style="color: var(--accent3); font-size: 1rem;">💻 エンジニア → 🎨 デザイナー</h3>
+          <div class="need-item"><span class="dot cyan"></span>実装可能な仕様・レスポンシブ定義</div>
+          <div class="need-item"><span class="dot cyan"></span>デザイントークンの統一</div>
+        </div>
+        <div class="needs-col">
+          <h3 style="color: var(--green); font-size: 1rem;">🎨 デザイナー → 💻 エンジニア</h3>
+          <div class="need-item"><span class="dot green"></span>デザイン通りの実装精度</div>
+          <div class="need-item"><span class="dot green"></span>技術的制約の早期共有</div>
+        </div>
       </div>
     </div>
     <p style="margin-top: 24px; text-align: center; font-size: 0.95rem;">

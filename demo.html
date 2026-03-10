@@ -472,13 +472,21 @@
           <li>開発リソース: 4名稼働中（計画通り）</li>
         </ul>
 
+        <h3>🎨 デザイン状況</h3>
+        <ul>
+          <li>UIコンポーネント完成率: <span class="metric">85% (42/50)</span></li>
+          <li>エンジニアへのハンドオフ待ち: <span class="warn">5コンポーネント</span></li>
+          <li>Figma未解決コメント: 3件</li>
+        </ul>
+
         <h3>📋 経営判断が必要な事項</h3>
         <ul>
           <li>1. 決済機能の<strong>承認判断</strong>（期限: 3月11日）</li>
           <li>2. 外部API連携の<strong>パートナーフォローアップ</strong>の指示</li>
+          <li>3. デザインシステムの<strong>トークンJSON化</strong>承認（工数1日、開発効率20%向上）</li>
         </ul>
 
-        <div class="source">データソース: <span>Issues</span> <span>Pull Requests</span> <span>Sprints</span> <span>Deployments</span></div>
+        <div class="source">データソース: <span>Issues</span> <span>Pull Requests</span> <span>Sprints</span> <span>Deployments</span> <span>Figma</span></div>
       </div>
     </div>
 
@@ -548,13 +556,25 @@
           <li><strong>リリース日の確約</strong> — クライアントへの案内に必要</li>
         </ul>
 
+        <h3>🎨 デザインチームが経営層に求めていること</h3>
+        <ul>
+          <li><strong>ブランド方針の確定</strong> — LP配色の最終承認が出ておらず、デザイン作業が手戻りリスク</li>
+          <li><strong>ユーザーリサーチ予算</strong> — ユーザビリティテスト未実施。投資判断を求めている</li>
+        </ul>
+
+        <h3>💻 エンジニア ↔ 🎨 デザイナー 相互ニーズ</h3>
+        <ul>
+          <li><span class="warn">エンジニア→デザイナー:</span> <strong>レスポンシブのブレイクポイント定義</strong>とデザイントークンのJSON化</li>
+          <li><span class="warn">デザイナー→エンジニア:</span> <strong>実装精度のフィードバック</strong>とデザインQAへの参加</li>
+        </ul>
+
         <h3>💡 Bridge の提案</h3>
         <ul>
           <li>ブロッカー #1 を今日中に解消すれば、チームの生産性が<strong>即座に回復</strong></li>
           <li>技術的負債への2スプリント投資は、中期的に開発速度<strong>20%改善</strong>（ROI: 3ヶ月で回収見込み）</li>
         </ul>
 
-        <div class="source">データソース: <span>Issues</span> <span>Pull Requests</span> <span>Sprints</span> <span>AI分析</span></div>
+        <div class="source">データソース: <span>Issues</span> <span>Pull Requests</span> <span>Sprints</span> <span>AI分析</span> <span>Figma Comments</span></div>
       </div>
     </div>
   </div>
@@ -575,8 +595,9 @@
           <li><strong>PRレビュー待ち:</strong> #156 (2日), #159 (1日), #163 (本日)</li>
           <li><strong>DORA指標:</strong> デプロイ頻度 <span class="ok">3.2回/週 (↑12%)</span>, MTTR <span class="metric">2.1h</span></li>
           <li><strong>CI/CD:</strong> 最終パイプライン成功、テストカバレッジ <span class="metric">82%</span></li>
+          <li><strong>デザインハンドオフ:</strong> <span class="warn">5コンポーネント</span>がFigmaで完成 → 実装待ち。デザイントークン未JSON化でCSS変数手動定義中</li>
         </ul>
-        <div class="source">データソース: <span>Issues</span> <span>Pull Requests</span> <span>CICD Deployments</span></div>
+        <div class="source">データソース: <span>Issues</span> <span>Pull Requests</span> <span>CICD Deployments</span> <span>Figma</span></div>
       </div>
     </div>
 
@@ -623,6 +644,8 @@
             </ul>
           </li>
           <li><strong>エンジニアハンドオフ状況:</strong> <span class="warn">5コンポーネント実装待ち</span></li>
+          <li><strong>経営層承認待ち:</strong> <span class="critical">LP配色の最終方針</span>が未確定 — 手戻りリスクあり</li>
+          <li><strong>開発チームとの連携:</strong> Sprint 12で実装される5コンポーネントの<span class="ok">デザインQA</span>を今週予定</li>
         </ul>
         <div class="source">データソース: <span>Figma Components</span> <span>Figma Comments</span> <span>Issues</span></div>
       </div>
