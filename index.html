@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BK AI Workplace — Bridge</title>
+<style>
+  :root {
+    --bg: #0a0a1a;
+    --surface: #12122a;
+    --card: #1a1a3e;
+    --accent: #6366f1;
+    --accent2: #ec4899;
+    --accent3: #22d3ee;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .tag {
+    display: inline-block;
+    background: rgba(99,102,241,0.15);
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+  }
+  .subtitle {
+    font-size: 1.2rem;
+    color: var(--muted);
+    text-align: center;
+    max-width: 500px;
+    margin-bottom: 48px;
+    line-height: 1.6;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 700px;
+    width: 100%;
+  }
+  .cards-3 { grid-template-columns: 1fr 1fr 1fr; max-width: 1000px; }
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(99,102,241,0.2);
+    border-radius: 16px;
+    padding: 32px 28px;
+    text-decoration: none;
+    color: var(--text);
+    transition: transform 0.2s, border-color 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 8px 32px rgba(99,102,241,0.2);
+  }
+  .card .icon { font-size: 3rem; margin-bottom: 16px; }
+  .card h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+  .card p { font-size: 0.9rem; color: var(--muted); line-height: 1.5; }
+  .card .badge {
+    margin-top: 16px;
+    font-size: 0.75rem;
+    background: rgba(99,102,241,0.12);
+    color: var(--accent3);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .footer {
+    margin-top: 48px;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  @media (max-width: 900px) {
+    .cards-3 { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .cards, .cards-3 { grid-template-columns: 1fr; }
+    h1 { font-size: 2.2rem; }
+  }
+</style>
+</head>
+<body>
+  <div class="tag">BK AI Workplace</div>
+  <h1>Bridge</h1>
+  <p class="subtitle">
+    エンジニア・経営層・デザイナーが<br>お互いの言葉で理解し合えるAIプラットフォーム
+  </p>
+
+  <div class="cards cards-3">
+    <a href="demo.html" class="card">
+      <div class="icon">🔄</div>
+      <h2>3ロール デモ</h2>
+      <p>経営層・エンジニア・デザイナーの3つのロールを切替えて体験。同じプロジェクトを異なる視点で確認。</p>
+      <span class="badge">ロール切替対応</span>
+    </a>
+    <a href="slides.html" class="card">
+      <div class="icon">📊</div>
+      <h2>プレゼンテーション</h2>
+      <p>Bridge の課題・解決策・アーキテクチャ・機能・導入メリットを9枚のスライドで解説。3ロール対応版。</p>
+      <span class="badge">9 スライド</span>
+    </a>
+    <a href="analysis.html" class="card">
+      <div class="icon">🔍</div>
+      <h2>競合分析</h2>
+      <p>Pensero AI, LinearB, Jellyfish 等8サービスとの比較。三者間翻訳+Figma統合のユニークな市場ポジションを解説。</p>
+      <span class="badge">8社比較</span>
+    </a>
+  </div>
+
+  <div class="footer">BK AI Workplace — Bridge v1.1</div>
+</body>
+</html>

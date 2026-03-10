@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BK Bridge — 競合分析レポート</title>
+<style>
+  :root {
+    --bg: #0a0a1a;
+    --surface: #12122a;
+    --card: #1a1a3e;
+    --accent: #6366f1;
+    --accent2: #ec4899;
+    --accent3: #22d3ee;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --green: #22c55e;
+    --yellow: #eab308;
+    --red: #ef4444;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 40px 20px;
+    line-height: 1.7;
+  }
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 32px;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--accent3); }
+  .tag {
+    display: inline-block;
+    background: rgba(99,102,241,0.15);
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .meta {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 40px;
+  }
+
+  /* Section headings */
+  .section-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 48px 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(99,102,241,0.3);
+  }
+  .section-title .num {
+    color: var(--accent);
+    margin-right: 8px;
+  }
+
+  /* Executive summary card */
+  .summary-card {
+    background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(236,72,153,0.08));
+    border: 1px solid rgba(99,102,241,0.25);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 32px;
+    font-size: 1.05rem;
+  }
+  .summary-card strong { color: var(--accent3); }
+
+  /* Comparison table */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 24px 0 40px;
+    border-radius: 12px;
+    border: 1px solid rgba(99,102,241,0.2);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    min-width: 700px;
+  }
+  thead {
+    background: var(--surface);
+  }
+  th {
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 700;
+    color: var(--accent3);
+    white-space: nowrap;
+    border-bottom: 2px solid rgba(99,102,241,0.3);
+  }
+  th:not(:first-child) { text-align: center; }
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(99,102,241,0.1);
+  }
+  td:not(:first-child) { text-align: center; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover { background: rgba(99,102,241,0.05); }
+  tr.highlight {
+    background: rgba(99,102,241,0.1);
+  }
+  .check { color: var(--green); font-weight: 700; }
+  .warn { color: var(--yellow); font-weight: 700; }
+  .cross { color: var(--red); font-weight: 700; }
+  .service-name { font-weight: 700; white-space: nowrap; }
+
+  /* Competitor detail cards */
+  .competitor-card {
+    background: var(--card);
+    border: 1px solid rgba(99,102,241,0.2);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .competitor-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 24px rgba(99,102,241,0.15);
+  }
+  .competitor-card h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .competitor-card h3 .num {
+    color: var(--accent);
+    margin-right: 6px;
+  }
+  .competitor-card .overview {
+    color: var(--muted);
+    font-size: 0.92rem;
+    margin-bottom: 16px;
+  }
+  .competitor-card .overlap {
+    font-size: 0.85rem;
+    color: var(--accent3);
+    margin-bottom: 16px;
+  }
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 12px;
+  }
+  .col-box {
+    background: rgba(10,10,26,0.5);
+    border-radius: 10px;
+    padding: 18px;
+  }
+  .col-box h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+  .col-box.bridge h4 { color: var(--green); }
+  .col-box.them h4 { color: var(--yellow); }
+  .col-box ul {
+    list-style: none;
+    padding: 0;
+  }
+  .col-box li {
+    font-size: 0.88rem;
+    color: var(--muted);
+    padding: 4px 0;
+    padding-left: 18px;
+    position: relative;
+  }
+  .col-box.bridge li::before {
+    content: '+';
+    position: absolute;
+    left: 0;
+    color: var(--green);
+    font-weight: 700;
+  }
+  .col-box.them li::before {
+    content: '~';
+    position: absolute;
+    left: 0;
+    color: var(--yellow);
+    font-weight: 700;
+  }
+  .diff-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 8px;
+  }
+  .diff-list li {
+    font-size: 0.88rem;
+    color: var(--muted);
+    padding: 4px 0 4px 18px;
+    position: relative;
+  }
+  .diff-list li::before {
+    content: '\2022';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
+
+  /* Unique value cards */
+  .value-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 24px 0;
+  }
+  .value-card {
+    background: var(--card);
+    border: 1px solid rgba(99,102,241,0.2);
+    border-radius: 14px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .value-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+  .value-card .v-num {
+    font-size: 2rem;
+    font-weight: 800;
+    color: rgba(99,102,241,0.2);
+    margin-bottom: 8px;
+  }
+  .value-card h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--accent3);
+  }
+  .value-card p {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* Positioning chart */
+  .chart-container {
+    position: relative;
+    background: var(--card);
+    border: 1px solid rgba(99,102,241,0.2);
+    border-radius: 16px;
+    padding: 40px 40px 60px 60px;
+    margin: 24px 0;
+    min-height: 400px;
+    overflow: hidden;
+  }
+  .chart-container .axis-y {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+    letter-spacing: 0.04em;
+  }
+  .chart-container .axis-x {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+    letter-spacing: 0.04em;
+  }
+  .chart-area {
+    position: relative;
+    width: 100%;
+    height: 340px;
+    border-left: 2px solid rgba(99,102,241,0.3);
+    border-bottom: 2px solid rgba(99,102,241,0.3);
+  }
+  /* grid lines */
+  .chart-area::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(to right, rgba(99,102,241,0.06) 0, rgba(99,102,241,0.06) 1px, transparent 1px, transparent 20%)
+      ,repeating-linear-gradient(to top, rgba(99,102,241,0.06) 0, rgba(99,102,241,0.06) 1px, transparent 1px, transparent 20%);
+  }
+  .dot {
+    position: absolute;
+    transform: translate(-50%, 50%);
+    text-align: center;
+    white-space: nowrap;
+  }
+  .dot .label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+    background: rgba(10,10,26,0.8);
+    padding: 3px 8px;
+    border-radius: 6px;
+    display: inline-block;
+  }
+  .dot .circle {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin: 0 auto 4px;
+  }
+  .dot.bridge-dot .circle {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    box-shadow: 0 0 16px rgba(99,102,241,0.5);
+  }
+  .dot.bridge-dot .label {
+    color: var(--accent3);
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+  .dot:not(.bridge-dot) .circle {
+    background: var(--muted);
+    opacity: 0.6;
+  }
+
+  /* Conclusion */
+  .conclusion-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .conclusion-item {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 20px;
+    border-left: 3px solid var(--accent);
+  }
+  .conclusion-item h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent3);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .conclusion-item.risk { border-left-color: var(--yellow); }
+  .conclusion-item.risk h4 { color: var(--yellow); }
+  .conclusion-item p {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .footer {
+    margin-top: 56px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  @media (max-width: 700px) {
+    h1 { font-size: 1.8rem; }
+    .columns { grid-template-columns: 1fr; }
+    .value-grid { grid-template-columns: 1fr; }
+    .conclusion-grid { grid-template-columns: 1fr; }
+    .chart-container { padding: 30px 30px 50px 50px; }
+    .chart-area { height: 280px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="index.html" class="back-link">&larr; Back</a>
+
+  <div class="tag">BK AI Workplace</div>
+  <h1>競合分析レポート</h1>
+  <p class="meta">調査日: 2026年3月 &mdash; エンジニア・経営層・デザイナー間のコミュニケーションギャップを解決するツール・サービス</p>
+
+  <!-- Executive Summary -->
+  <h2 class="section-title">エグゼクティブサマリー</h2>
+  <div class="summary-card">
+    Bridge と完全に同じコンセプト（エンジニア&#8596;経営層&#8596;デザイナーの三者間自然言語翻訳 + プロジェクト/デザインデータ統合 + ニーズ分析）を提供するサービスは<strong>現時点で存在しない</strong>。ただし、部分的に重複する機能を持つサービスが複数ある。
+  </div>
+
+  <!-- Comparison Table -->
+  <h2 class="section-title">競合マッピング</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>サービス</th>
+          <th>言語翻訳</th>
+          <th>データ統合</th>
+          <th>デザイン統合</th>
+          <th>ニーズ分析</th>
+          <th>セルフホスト</th>
+          <th>対象</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight">
+          <td class="service-name">BK Bridge</td>
+          <td><span class="check">&#10003; 三者間</span></td>
+          <td><span class="check">&#10003; DevLake</span></td>
+          <td><span class="check">&#10003; Figma API</span></td>
+          <td><span class="check">&#10003; AI分析</span></td>
+          <td><span class="check">&#10003;</span></td>
+          <td style="text-align:left">エンジニア&#8596;経営層&#8596;デザイナー</td>
+        </tr>
+        <tr>
+          <td class="service-name">Pensero AI</td>
+          <td><span class="check">&#10003; 一方向</span></td>
+          <td><span class="warn">&#9888; 部分的</span></td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="cross">&#10005; SaaS</span></td>
+          <td style="text-align:left">エンジニア→経営層</td>
+        </tr>
+        <tr>
+          <td class="service-name">LinearB</td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="check">&#10003; Git分析</span></td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="cross">&#10005; SaaS</span></td>
+          <td style="text-align:left">エンジニアリーダー</td>
+        </tr>
+        <tr>
+          <td class="service-name">Jellyfish</td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="check">&#10003; 多ソース</span></td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="warn">&#9888; 手動</span></td>
+          <td><span class="cross">&#10005; SaaS</span></td>
+          <td style="text-align:left">VPofEng / CTO</td>
+        </tr>
+        <tr>
+          <td class="service-name">Swarmia</td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="check">&#10003; Git/Jira</span></td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="cross">&#10005; SaaS</span></td>
+          <td style="text-align:left">エンジニアチーム</td>
+        </tr>
+        <tr>
+          <td class="service-name">Faros AI</td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="check">&#10003; 多ソース</span></td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="warn">&#9888;</span></td>
+          <td style="text-align:left">データチーム</td>
+        </tr>
+        <tr>
+          <td class="service-name">DevLake + Grafana</td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="check">&#10003; OSS</span></td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="check">&#10003;</span></td>
+          <td style="text-align:left">エンジニア</td>
+        </tr>
+        <tr>
+          <td class="service-name">ChatGPT / Claude</td>
+          <td><span class="warn">&#9888; 手動</span></td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="cross">&#10005;</span></td>
+          <td><span class="warn">&#9888; 手動</span></td>
+          <td><span class="cross">&#10005;</span></td>
+          <td style="text-align:left">汎用</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Competitor Details -->
+  <h2 class="section-title">競合詳細</h2>
+
+  <!-- Pensero AI -->
+  <div class="competitor-card">
+    <h3><span class="num">01</span> Pensero AI &mdash; 最も近い競合</h3>
+    <p class="overview">AIを使ってエンジニアリングデータを経営層向けに翻訳するSaaS。エンジニアリングデータをビジネス言語に変換する思想、AIによる自然言語での報告生成、DORA指標等の開発メトリクス活用で共通。</p>
+    <div class="columns">
+      <div class="col-box bridge">
+        <h4>Bridge の優位性</h4>
+        <ul>
+          <li>三者間翻訳（Pensero は一方向のみ）</li>
+          <li>デザインデータ統合（Figma API連携、Pensero にはない）</li>
+          <li>ニーズ分析を自動抽出（6方向）</li>
+          <li>完全セルフホスト対応</li>
+          <li>Open WebUI に統合、学習コスト不要</li>
+        </ul>
+      </div>
+      <div class="col-box them">
+        <h4>Pensero の優位性</h4>
+        <ul>
+          <li>SaaSのため即座に導入可能</li>
+          <li>専用ダッシュボードが洗練</li>
+          <li>大規模チーム向けの実績あり</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- LinearB -->
+  <div class="competitor-card">
+    <h3><span class="num">02</span> LinearB</h3>
+    <p class="overview">Git リポジトリを分析し、開発効率のメトリクスを可視化するプラットフォーム。</p>
+    <p class="overlap">重複範囲: 開発メトリクスの収集・可視化（DORA指標、PRサイクルタイム等）</p>
+    <ul class="diff-list">
+      <li>LinearB はダッシュボード型（数値表示）。Bridge は自然言語で対話型</li>
+      <li>LinearB に言語翻訳機能はない</li>
+      <li>LinearB は経営層が直接使うことを想定していない（エンジニアリーダー向け）</li>
+    </ul>
+  </div>
+
+  <!-- Jellyfish -->
+  <div class="competitor-card">
+    <h3><span class="num">03</span> Jellyfish</h3>
+    <p class="overview">エンジニアリング投資と事業成果を紐付ける経営層向けプラットフォーム。</p>
+    <p class="overlap">重複範囲: 経営層向けのエンジニアリング可視化</p>
+    <ul class="diff-list">
+      <li>Jellyfish はコスト配分・ROI分析に強い。Bridge はコミュニケーション改善に焦点</li>
+      <li>Jellyfish に自然言語翻訳やチャット機能はない</li>
+      <li>Jellyfish は高価格帯（エンタープライズ向け）</li>
+    </ul>
+  </div>
+
+  <!-- Swarmia -->
+  <div class="competitor-card">
+    <h3><span class="num">04</span> Swarmia</h3>
+    <p class="overview">開発チームの生産性を可視化し、ボトルネックを特定するツール。</p>
+    <p class="overlap">重複範囲: 開発メトリクス、ブロッカー検出</p>
+    <ul class="diff-list">
+      <li>エンジニアチーム内部向けのツール（経営層向け翻訳なし）</li>
+      <li>チャットインターフェースなし</li>
+    </ul>
+  </div>
+
+  <!-- Faros AI -->
+  <div class="competitor-card">
+    <h3><span class="num">05</span> Faros AI</h3>
+    <p class="overview">複数のデータソースからエンジニアリングメトリクスを統合するプラットフォーム。</p>
+    <p class="overlap">重複範囲: 多ソースデータ統合</p>
+    <ul class="diff-list">
+      <li>データパイプライン構築ツールであり、言語翻訳やAI対話機能はない</li>
+      <li>セルフホスト版も一部提供あり</li>
+    </ul>
+  </div>
+
+  <!-- DevLake + Grafana -->
+  <div class="competitor-card">
+    <h3><span class="num">06</span> Apache DevLake + Grafana（OSS構成）</h3>
+    <p class="overview">Bridge が内部で使用しているのと同じOSSスタック。</p>
+    <p class="overlap">重複範囲: プロジェクトデータの収集・可視化</p>
+    <ul class="diff-list">
+      <li>DevLake + Grafana だけではダッシュボード止まり。自然言語での対話・翻訳機能がない</li>
+      <li>経営層がGrafanaのダッシュボードを読み解くスキルが必要</li>
+      <li>Bridge はこの上にAI翻訳レイヤーを追加した構成</li>
+    </ul>
+  </div>
+
+  <!-- ChatGPT / Claude -->
+  <div class="competitor-card">
+    <h3><span class="num">07</span> ChatGPT / Claude 直接利用</h3>
+    <p class="overview">汎用AIにプロジェクト情報を手動入力して翻訳させる運用。</p>
+    <p class="overlap">重複範囲: 言語翻訳（手動）</p>
+    <ul class="diff-list">
+      <li>プロジェクトデータとの自動連携がない（毎回手動でコピペ）</li>
+      <li>ロール自動判定がない</li>
+      <li>ニーズ分析の自動化がない</li>
+      <li>データの鮮度保証がない</li>
+    </ul>
+  </div>
+
+  <!-- Unique Value -->
+  <h2 class="section-title">Bridge のユニークな価値</h2>
+  <div class="value-grid">
+    <div class="value-card">
+      <div class="v-num">01</div>
+      <h4>三者間言語翻訳</h4>
+      <p>既存ツールはほぼすべて「エンジニア→経営層」方向のみ。Bridge は経営層&#8596;エンジニア&#8596;デザイナーの三者間翻訳をサポート。経営層の「コスト削減して」をエンジニアには「インフラ最適化、キャッシュ導入」、デザイナーには「既存コンポーネント再利用率向上」と翻訳する。</p>
+    </div>
+    <div class="value-card">
+      <div class="v-num">02</div>
+      <h4>デザインデータ統合（Figma API）</h4>
+      <p>Figma REST APIと連携し、コンポーネント一覧・レビューコメント・バージョン履歴をリアルタイム取得。デザイナーの作業状況をエンジニアや経営層が自然言語で確認できる。競合にこの機能を持つサービスはない。</p>
+    </div>
+    <div class="value-card">
+      <div class="v-num">03</div>
+      <h4>三者間ニーズ分析エンジン</h4>
+      <p>プロジェクト+デザインデータから6方向（経営層&#8596;エンジニア、経営層&#8596;デザイナー、エンジニア&#8596;デザイナー）のニーズを自動抽出。会議前の論点整理に有効。</p>
+    </div>
+    <div class="value-card">
+      <div class="v-num">04</div>
+      <h4>完全セルフホスト</h4>
+      <p>全コンポーネントがDocker Compose一発で自社環境にデプロイ可能。機密データが外部に出ない。</p>
+    </div>
+    <div class="value-card">
+      <div class="v-num">05</div>
+      <h4>既存チャットUIへの統合</h4>
+      <p>Open WebUI のPipeline/Toolとして統合されるため、新しいUI/ツールの学習コストがゼロ。</p>
+    </div>
+  </div>
+
+  <!-- Positioning Chart -->
+  <h2 class="section-title">市場ポジショニング</h2>
+  <div class="chart-container">
+    <div class="axis-y">&#8593; ビジネス言語対応</div>
+    <div class="axis-x">データ統合の深さ &#8594;</div>
+    <div class="chart-area">
+      <!-- BK Bridge - top right -->
+      <div class="dot bridge-dot" style="left: 82%; bottom: 88%;">
+        <div class="circle"></div>
+        <div class="label">BK Bridge &#9733;</div>
+      </div>
+      <!-- Jellyfish - top left-center -->
+      <div class="dot" style="left: 38%; bottom: 80%;">
+        <div class="circle"></div>
+        <div class="label">Jellyfish</div>
+      </div>
+      <!-- Pensero AI - mid-left -->
+      <div class="dot" style="left: 30%; bottom: 62%;">
+        <div class="circle"></div>
+        <div class="label">Pensero AI</div>
+      </div>
+      <!-- LinearB - mid-center -->
+      <div class="dot" style="left: 45%; bottom: 42%;">
+        <div class="circle"></div>
+        <div class="label">LinearB</div>
+      </div>
+      <!-- Swarmia - mid-center left -->
+      <div class="dot" style="left: 42%; bottom: 36%;">
+        <div class="circle"></div>
+        <div class="label">Swarmia</div>
+      </div>
+      <!-- DevLake + Grafana - bottom center -->
+      <div class="dot" style="left: 50%; bottom: 16%;">
+        <div class="circle"></div>
+        <div class="label">DevLake+Grafana</div>
+      </div>
+      <!-- Faros AI - bottom right -->
+      <div class="dot" style="left: 68%; bottom: 18%;">
+        <div class="circle"></div>
+        <div class="label">Faros AI</div>
+      </div>
+      <!-- ChatGPT/Claude - bottom left -->
+      <div class="dot" style="left: 12%; bottom: 10%;">
+        <div class="circle"></div>
+        <div class="label">ChatGPT/Claude</div>
+      </div>
+    </div>
+  </div>
+  <p style="color: var(--muted); font-size: 0.9rem; margin-top: -8px; margin-bottom: 32px;">
+    Bridge は「ビジネス言語対応 &times; データ統合」の右上象限に位置し、既存ツールがカバーしていない領域を占める。
+  </p>
+
+  <!-- Conclusion -->
+  <h2 class="section-title">結論</h2>
+  <div class="conclusion-grid">
+    <div class="conclusion-item">
+      <h4>直接競合</h4>
+      <p>Pensero AI が最も近いが、一方向翻訳・SaaS限定・デザイン統合なしで差別化は明確。</p>
+    </div>
+    <div class="conclusion-item">
+      <h4>間接競合</h4>
+      <p>LinearB, Jellyfish, Swarmia はメトリクス可視化で重複するが、言語翻訳・デザイン統合機能を持たない。</p>
+    </div>
+    <div class="conclusion-item">
+      <h4>Bridge の防御壁</h4>
+      <p>三者間翻訳 + Figma統合 + ニーズ分析(6方向) + セルフホスト + 既存UI統合の組み合わせは現時点で他にない。</p>
+    </div>
+    <div class="conclusion-item risk">
+      <h4>リスク</h4>
+      <p>大手SaaS（LinearB, Jellyfish）がAI翻訳機能を追加する可能性は中期的にある。ただしデザイン統合まで実装する競合は短期的には出にくい。</p>
+    </div>
+  </div>
+
+  <div class="footer">BK AI Workplace &mdash; Bridge v1.1</div>
+</div>
+</body>
+</html>

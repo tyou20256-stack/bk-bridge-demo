@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BK AI Workplace — Bridge</title>
+<style>
+  :root {
+    --bg: #0a0a1a;
+    --surface: #12122a;
+    --card: #1a1a3e;
+    --accent: #6366f1;
+    --accent2: #ec4899;
+    --accent3: #22d3ee;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --green: #4ade80;
+    --orange: #fb923c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  /* ── Slide Container ── */
+  .deck { position: relative; width: 100vw; height: 100vh; }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 80px 80px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    overflow-y: auto;
+  }
+  .slide.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* ── Typography ── */
+  h1 {
+    font-size: 3.2rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  h2 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin-bottom: 32px;
+    color: var(--text);
+  }
+  h3 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--accent3);
+    margin-bottom: 12px;
+  }
+  .subtitle {
+    font-size: 1.3rem;
+    color: var(--muted);
+    margin-bottom: 40px;
+    text-align: center;
+    max-width: 700px;
+  }
+  p { font-size: 1.1rem; line-height: 1.7; color: var(--muted); }
+
+  /* ── Cards Grid ── */
+  .cards {
+    display: grid;
+    gap: 24px;
+    width: 100%;
+    max-width: 1100px;
+  }
+  .cards-2 { grid-template-columns: 1fr 1fr; }
+  .cards-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(99,102,241,0.2);
+    border-radius: 16px;
+    padding: 28px 24px;
+    transition: transform 0.2s;
+  }
+  .card:hover { transform: translateY(-2px); }
+  .card .icon {
+    font-size: 2.2rem;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .card p { font-size: 0.95rem; }
+
+  /* ── Problem slide ── */
+  .vs-row {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    width: 100%;
+    max-width: 1000px;
+  }
+  .vs-box {
+    flex: 1;
+    background: var(--card);
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+  }
+  .vs-box.mgmt { border: 2px solid var(--accent2); }
+  .vs-box.eng  { border: 2px solid var(--accent3); }
+  .vs-box.des  { border: 2px solid var(--green); }
+  .vs-arrow {
+    font-size: 2rem;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .speech {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+    font-size: 0.95rem;
+    color: var(--text);
+    text-align: left;
+    position: relative;
+  }
+  .speech::before {
+    content: '"';
+    font-size: 2rem;
+    color: var(--accent);
+    position: absolute;
+    top: 4px; left: 10px;
+    opacity: 0.5;
+  }
+  .speech span { display: block; padding-left: 20px; }
+
+  /* ── Flow diagram ── */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 1100px;
+  }
+  .flow-box {
+    background: var(--card);
+    border: 1px solid rgba(99,102,241,0.3);
+    border-radius: 12px;
+    padding: 18px 22px;
+    text-align: center;
+    min-width: 140px;
+  }
+  .flow-box.highlight {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(236,72,153,0.1));
+    box-shadow: 0 0 24px rgba(99,102,241,0.2);
+  }
+  .flow-box .label { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+  .flow-arrow { font-size: 1.4rem; color: var(--accent); }
+
+  /* ── Example conversation ── */
+  .convo {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .convo-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .convo-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+  }
+  .convo-item {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 20px;
+    border-left: 4px solid;
+  }
+  .convo-item.mgmt { border-left-color: var(--accent2); }
+  .convo-item.eng  { border-left-color: var(--accent3); }
+  .convo-item.des  { border-left-color: var(--green); }
+  .convo-item .role {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .convo-item.mgmt .role { color: var(--accent2); }
+  .convo-item.eng  .role { color: var(--accent3); }
+  .convo-item.des  .role { color: var(--green); }
+  .convo-item .q {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+  .convo-item .a {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .convo-item .a strong { color: var(--text); font-weight: 600; }
+
+  /* ── Needs slide ── */
+  .needs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    width: 100%;
+    max-width: 1000px;
+  }
+  .needs-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 32px;
+    width: 100%;
+    max-width: 1200px;
+  }
+  .needs-col { display: flex; flex-direction: column; gap: 12px; }
+  .needs-col h3 { font-size: 1.1rem; margin-bottom: 4px; }
+  .need-item {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 0.92rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .need-item .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .need-item .dot.pink { background: var(--accent2); }
+  .need-item .dot.cyan { background: var(--accent3); }
+  .need-item .dot.green { background: var(--green); }
+
+  /* ── Architecture slide ── */
+  .arch {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+  }
+  .arch-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .arch-box {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 12px 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255,255,255,0.08);
+    min-width: 120px;
+  }
+  .arch-box.core {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(236,72,153,0.08));
+  }
+  .arch-box small { display: block; font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+  .arch-line {
+    color: var(--muted);
+    font-size: 1.2rem;
+  }
+
+  /* ── Benefits ── */
+  .benefit-list {
+    list-style: none;
+    max-width: 800px;
+    width: 100%;
+  }
+  .benefit-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 1.05rem;
+  }
+  .benefit-list li:last-child { border-bottom: none; }
+  .benefit-list .num {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+    font-weight: 800;
+    font-size: 0.85rem;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .benefit-list .text strong { color: var(--text); }
+  .benefit-list .text { color: var(--muted); line-height: 1.6; }
+
+  /* ── Navigation ── */
+  .nav {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 100;
+  }
+  .nav button {
+    background: var(--card);
+    border: 1px solid rgba(99,102,241,0.3);
+    color: var(--text);
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .nav button:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .dots {
+    display: flex;
+    gap: 6px;
+  }
+  .dots span {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    transition: background 0.3s;
+  }
+  .dots span.active { background: var(--accent); }
+  .dots span { cursor: pointer; }
+  .dots span:hover { background: rgba(255,255,255,0.35); }
+
+  /* ── Code ── */
+  code {
+    background: rgba(99,102,241,0.15);
+    color: var(--accent3);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+
+  /* ── Tag ── */
+  .tag {
+    display: inline-block;
+    background: rgba(99,102,241,0.15);
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 800px) {
+    .slide { padding: 40px 24px; }
+    h1 { font-size: 2.2rem; }
+    h2 { font-size: 1.6rem; }
+    .cards-2, .cards-3, .convo-row, .convo-row-3, .needs-grid, .needs-grid-3 { grid-template-columns: 1fr; }
+    .vs-row { flex-direction: column; gap: 16px; }
+    .vs-arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- ====== SLIDE 1: Title ====== -->
+  <div class="slide active" data-slide="0">
+    <div class="tag">BK AI Workplace</div>
+    <h1>Bridge</h1>
+    <p class="subtitle">
+      エンジニア・経営層・デザイナーが<br>
+      お互いの言葉で理解し合えるAIプラットフォーム
+    </p>
+    <div style="margin-top: 24px; display: flex; flex-direction: column; align-items: center; gap: 16px;">
+      <!-- Top: Engineer and Designer -->
+      <div class="flow" style="justify-content: center;">
+        <div class="flow-box" style="border-color: var(--accent3);">
+          <div style="font-size:1.6rem;">💻</div>
+          <div style="font-weight:600;">エンジニア</div>
+          <div class="label">技術語</div>
+        </div>
+        <div class="flow-arrow">&#10230;</div>
+        <div class="flow-box highlight">
+          <div style="font-size:1.6rem;">🤖</div>
+          <div style="font-weight:600;">Bridge AI</div>
+          <div class="label">自動翻訳</div>
+        </div>
+        <div class="flow-arrow">&#10230;</div>
+        <div class="flow-box" style="border-color: var(--accent2);">
+          <div style="font-size:1.6rem;">💼</div>
+          <div style="font-weight:600;">経営層</div>
+          <div class="label">ビジネス語</div>
+        </div>
+      </div>
+      <!-- Bottom: Designer connected to Bridge -->
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div class="flow-box" style="border-color: var(--green);">
+          <div style="font-size:1.6rem;">🎨</div>
+          <div style="font-weight:600;">デザイナー</div>
+          <div class="label">デザイン語</div>
+        </div>
+        <div class="flow-arrow">&#10230; Bridge &#10230;</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 2: Problem ====== -->
+  <div class="slide" data-slide="1">
+    <div class="tag">課題</div>
+    <h2>同じプロジェクト、違う言語</h2>
+    <div class="vs-row">
+      <div class="vs-box eng">
+        <div style="font-size:2rem; margin-bottom:12px;">💻</div>
+        <h3 style="color: var(--accent3);">エンジニア</h3>
+        <div class="speech">
+          <span>PR #142 がマージされてなくて、<br>CI/CDパイプラインが red です。<br>BK-89 のDB移行に依存してます。</span>
+        </div>
+      </div>
+      <div class="vs-arrow">&#10231;</div>
+      <div class="vs-box mgmt">
+        <div style="font-size:2rem; margin-bottom:12px;">💼</div>
+        <h3 style="color: var(--accent2);">経営層</h3>
+        <div class="speech">
+          <span>で、結局いつリリースできるの？<br>コストはどうなってる？<br>何を判断すればいい？</span>
+        </div>
+      </div>
+      <div class="vs-arrow">&#10231;</div>
+      <div class="vs-box des">
+        <div style="font-size:2rem; margin-bottom:12px;">🎨</div>
+        <h3 style="color: var(--green);">デザイナー</h3>
+        <div class="speech">
+          <span>Figmaでコンポーネント作ったのに、<br>実装が全然違う。<br>レスポンシブの定義も無視されてる…</span>
+        </div>
+      </div>
+    </div>
+    <p style="margin-top: 32px; text-align: center; max-width: 600px;">
+      3者それぞれの専門用語の壁により、重要な情報が伝わらず<br>意思決定の遅延やミスコミュニケーションが発生
+    </p>
+  </div>
+
+  <!-- ====== SLIDE 3: Solution ====== -->
+  <div class="slide" data-slide="2">
+    <div class="tag">解決策</div>
+    <h2>Bridge が自動翻訳する</h2>
+    <p class="subtitle">同じ質問、同じデータ、<strong style="color: var(--text);">相手に合った言葉</strong>で回答</p>
+    <div class="convo" style="max-width: 1200px;">
+      <div style="text-align:center; font-weight:600; color:var(--text); font-size:1.1rem; margin-bottom: 4px;">
+        質問: 「プロジェクトの進捗は？」
+      </div>
+      <div class="convo-row-3">
+        <div class="convo-item mgmt">
+          <div class="role">💼 経営層への回答</div>
+          <div class="a">
+            <strong>完了率 78%</strong>、予定通り。<br>
+            ブロッカー2件:<br>
+            ・決済機能の承認待ち（<strong>2日以内の判断必要</strong>）<br>
+            ・外部API仕様の確定待ち<br>
+            今月のAIコスト: <strong>$1,200 / $2,000予算</strong>
+          </div>
+        </div>
+        <div class="convo-item eng">
+          <div class="role">💻 エンジニアへの回答</div>
+          <div class="a">
+            Sprint 12: <strong>18/24 Issue完了 (75%)</strong><br>
+            ブロッカー:<br>
+            ・<strong>BK-89</strong>: DB移行依存 → migration PR #156 待ち<br>
+            ・<strong>BK-102</strong>: API設計未確定<br>
+            PRレビュー待ち: <strong>#156</strong>(2日), <strong>#159</strong>(1日)
+          </div>
+        </div>
+        <div class="convo-item des">
+          <div class="role">🎨 デザイナーへの回答</div>
+          <div class="a">
+            コンポーネント完成率 <strong>85%</strong> (42/50)<br>
+            未解決レビューコメント: <strong>3件</strong><br>
+            ・ボタンのhover状態未定義 → Figma更新済み<br>
+            ・LP配色のコントラスト不足 → WCAG AA達成済み<br>
+            エンジニアハンドオフ待ち: <strong>5コンポーネント</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 4: Architecture ====== -->
+  <div class="slide" data-slide="3">
+    <div class="tag">仕組み</div>
+    <h2>システム構成</h2>
+    <div class="arch">
+      <div class="arch-row">
+        <div class="arch-box" style="border-color: var(--accent2);">💼 経営層<small>Open WebUI</small></div>
+        <div class="arch-line" style="flex: 1; height: 2px; background: linear-gradient(90deg, var(--accent2), var(--accent3)); border-radius: 1px;"></div>
+        <div class="arch-box" style="border-color: var(--accent3);">💻 エンジニア<small>Open WebUI</small></div>
+        <div class="arch-line" style="flex: 1; height: 2px; background: linear-gradient(90deg, var(--accent3), var(--green)); border-radius: 1px;"></div>
+        <div class="arch-box" style="border-color: var(--green);">🎨 デザイナー<small>Open WebUI</small></div>
+      </div>
+      <div class="arch-line">&#8595;</div>
+      <div class="arch-row">
+        <div class="arch-box core" style="min-width: 280px;">
+          🤖 <strong>Pipeline</strong> — ロール自動判定<small>ユーザーのグループから経営層/エンジニア/デザイナーの3ロールを識別</small>
+        </div>
+      </div>
+      <div class="arch-line">&#8595;</div>
+      <div class="arch-row">
+        <div class="arch-box core" style="min-width: 280px;">
+          🎯 <strong>Bridge API</strong> — データ収集 + AI翻訳<small>DevLakeからプロジェクト指標を取得 → LLMでロール別に変換</small>
+        </div>
+      </div>
+      <div class="arch-line">&#8595;</div>
+      <div class="arch-row">
+        <div class="arch-box">Jira<small>Issue / Sprint</small></div>
+        <div class="arch-box">GitHub<small>PR / Deploy</small></div>
+        <div class="arch-box">DevLake<small>データ統合</small></div>
+        <div class="arch-box">LiteLLM<small>AI Gateway</small></div>
+        <div class="arch-box" style="border-color: var(--green);">Figma<small>コンポーネント / コメント</small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 5: Features ====== -->
+  <div class="slide" data-slide="4">
+    <div class="tag">機能</div>
+    <h2>3つのコア機能</h2>
+    <div class="cards cards-3">
+      <div class="card">
+        <span class="icon">💬</span>
+        <h3>自然言語クエリ</h3>
+        <p>「進捗は？」「リスクは？」と聞くだけ。AIがプロジェクトデータを参照し、ロールに合った言葉で回答。</p>
+      </div>
+      <div class="card">
+        <span class="icon">🔄</span>
+        <h3>言語ブリッジ</h3>
+        <p>技術用語 &#10231; ビジネス用語 &#10231; デザイン用語を自動変換。「PRレビュー待ち」→「コード確認の承認待ち」→「ハンドオフ待ち」のように翻訳。</p>
+      </div>
+      <div class="card">
+        <span class="icon">🤝</span>
+        <h3>ニーズ分析</h3>
+        <p>経営層・エンジニア・デザイナーの三者間で互いに何を求めているかをAIが自動分析。コミュニケーションギャップを可視化。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 6: Needs ====== -->
+  <div class="slide" data-slide="5">
+    <div class="tag">ニーズ可視化</div>
+    <h2>お互いが必要としていること</h2>
+    <div class="needs-grid-3">
+      <div class="needs-col">
+        <h3 style="color: var(--accent2);">💼 経営層 → エンジニアに求めること</h3>
+        <div class="need-item"><span class="dot pink"></span>進捗の可視性（完了率・遅延リスク）</div>
+        <div class="need-item"><span class="dot pink"></span>リソース配分の妥当性</div>
+        <div class="need-item"><span class="dot pink"></span>納期予測の精度</div>
+        <div class="need-item"><span class="dot pink"></span>コスト対効果の説明</div>
+        <div class="need-item"><span class="dot pink"></span>リスクの早期警告</div>
+      </div>
+      <div class="needs-col">
+        <h3 style="color: var(--accent3);">💻 エンジニア → 経営層に求めること</h3>
+        <div class="need-item"><span class="dot cyan"></span>優先度の明確化と根拠</div>
+        <div class="need-item"><span class="dot cyan"></span>ブロッカー解除の意思決定</div>
+        <div class="need-item"><span class="dot cyan"></span>リソース（人員・ツール・予算）</div>
+        <div class="need-item"><span class="dot cyan"></span>技術的負債への投資承認</div>
+        <div class="need-item"><span class="dot cyan"></span>仕様の確定・スコープ決定</div>
+      </div>
+      <div class="needs-col">
+        <h3 style="color: var(--green);">🎨 デザイナー → チームに求めること</h3>
+        <div class="need-item"><span class="dot green"></span>実装精度のフィードバック</div>
+        <div class="need-item"><span class="dot green"></span>デザインQAへの参加</div>
+        <div class="need-item"><span class="dot green"></span>ブランド方針の承認</div>
+        <div class="need-item"><span class="dot green"></span>ユーザーリサーチ予算</div>
+      </div>
+    </div>
+    <p style="margin-top: 24px; text-align: center; font-size: 0.95rem;">
+      Bridge がプロジェクトデータから<strong style="color: var(--text);">具体的なニーズを自動抽出</strong>して提示
+    </p>
+  </div>
+
+  <!-- ====== SLIDE 7: API ====== -->
+  <div class="slide" data-slide="6">
+    <div class="tag">API</div>
+    <h2>Bridge API エンドポイント</h2>
+    <div class="cards cards-2" style="max-width: 900px;">
+      <div class="card">
+        <h3 style="font-family: monospace; font-size: 1rem;">POST /query</h3>
+        <p>自然言語でプロジェクトについて質問。<code style="color:var(--accent3);">role</code> パラメータで経営語/技術語を切替。</p>
+      </div>
+      <div class="card">
+        <h3 style="font-family: monospace; font-size: 1rem;">GET /metrics/{project}</h3>
+        <p>Issue完了率、PR状況、スプリント進捗、デプロイ状況、ブロッカー一覧を取得。</p>
+      </div>
+      <div class="card">
+        <h3 style="font-family: monospace; font-size: 1rem;">GET /summary/{project}</h3>
+        <p>プロジェクトの包括的サマリーを生成。<code style="color:var(--accent3);">?role=management</code> でロール指定。</p>
+      </div>
+      <div class="card">
+        <h3 style="font-family: monospace; font-size: 1rem;">GET /needs/{project}</h3>
+        <p>三者のニーズをAIが分析。相互理解のギャップを特定。</p>
+      </div>
+      <div class="card">
+        <h3 style="font-family: monospace; font-size: 1rem;">GET /figma/{file_key}</h3>
+        <p>Figmaファイルのコンポーネント・コメント・バージョン情報を取得。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 8: Benefits ====== -->
+  <div class="slide" data-slide="7">
+    <div class="tag">効果</div>
+    <h2>導入メリット</h2>
+    <ul class="benefit-list">
+      <li>
+        <span class="num">1</span>
+        <span class="text"><strong>意思決定の加速</strong> — 技術報告を待たず、経営層がリアルタイムでプロジェクト状況を把握。判断に必要な情報がビジネス語で即座に届く。</span>
+      </li>
+      <li>
+        <span class="num">2</span>
+        <span class="text"><strong>報告コストの削減</strong> — エンジニアが経営向け報告書を手作業で作る時間をゼロに。AIがデータから自動生成。</span>
+      </li>
+      <li>
+        <span class="num">3</span>
+        <span class="text"><strong>ミスコミュニケーション防止</strong> — 「技術的負債」「MTTR」などの専門用語を相手が理解できる言葉に自動変換。認識のズレを解消。</span>
+      </li>
+      <li>
+        <span class="num">4</span>
+        <span class="text"><strong>ニーズの見える化</strong> — お互いが何を求めているか、データに基づいて自動分析。会議前に論点が明確になる。</span>
+      </li>
+      <li>
+        <span class="num">5</span>
+        <span class="text"><strong>既存インフラに統合</strong> — Jira / GitHub / DevLake の既存データを活用。新しいツール学習不要。チャットで聞くだけ。</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- ====== SLIDE 9: Summary ====== -->
+  <div class="slide" data-slide="8">
+    <h1>Bridge</h1>
+    <p class="subtitle" style="font-size: 1.5rem; color: var(--text); margin-bottom: 16px;">
+      エンジニア・経営層・デザイナー<br>3者の言葉の壁をAIで取り除く
+    </p>
+    <p class="subtitle" style="margin-bottom: 40px;">
+      同じデータ、同じプラットフォーム。<br>
+      それぞれの言語で、お互いを理解する。
+    </p>
+    <div class="flow">
+      <div class="flow-box" style="border-color: var(--green); background: rgba(74,222,128,0.08);">
+        <div style="font-weight:600; color: var(--green);">Open WebUI</div>
+        <div class="label">チャットUI</div>
+      </div>
+      <div class="flow-arrow">+</div>
+      <div class="flow-box" style="border-color: var(--accent); background: rgba(99,102,241,0.08);">
+        <div style="font-weight:600; color: var(--accent);">Bridge API</div>
+        <div class="label">データ + AI翻訳</div>
+      </div>
+      <div class="flow-arrow">+</div>
+      <div class="flow-box" style="border-color: var(--orange); background: rgba(251,146,60,0.08);">
+        <div style="font-weight:600; color: var(--orange);">DevLake</div>
+        <div class="label">Jira + GitHub</div>
+      </div>
+      <div class="flow-arrow">+</div>
+      <div class="flow-box" style="border-color: var(--green); background: rgba(74,222,128,0.08);">
+        <div style="font-weight:600; color: var(--green);">Figma</div>
+        <div class="label">コンポーネント + コメント</div>
+      </div>
+    </div>
+    <p style="margin-top: 40px; font-size: 0.85rem; color: var(--muted);">
+      BK AI Workplace &mdash; Bridge v1.1
+    </p>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button id="prev" aria-label="Previous">&#8592;</button>
+  <div class="dots" id="dots"></div>
+  <button id="next" aria-label="Next">&#8594;</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('dots');
+  let current = 0;
+
+  // Build dots
+  slides.forEach((_, i) => {
+    const d = document.createElement('span');
+    d.setAttribute('role', 'button');
+    d.setAttribute('aria-label', `Slide ${i + 1}`);
+    d.setAttribute('tabindex', '0');
+    if (i === 0) d.classList.add('active');
+    d.addEventListener('click', () => go(i));
+    d.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(i); });
+    dotsEl.appendChild(d);
+  });
+  const dots = dotsEl.querySelectorAll('span');
+
+  function go(n) {
+    if (n < 0 || n >= slides.length) return;
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = n;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+  }
+
+  document.getElementById('prev').addEventListener('click', () => go(current - 1));
+  document.getElementById('next').addEventListener('click', () => go(current + 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); go(current + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(current - 1); }
+    if (e.key === ' ' && e.target === document.body) { e.preventDefault(); go(current + 1); }
+    if (e.key === 'Home') { e.preventDefault(); go(0); }
+    if (e.key === 'End') { e.preventDefault(); go(slides.length - 1); }
+  });
+
+  // Touch swipe
+  let touchX = 0;
+  document.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; });
+  document.addEventListener('touchend', (e) => {
+    const diff = touchX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) { diff > 0 ? go(current + 1) : go(current - 1); }
+  });
+</script>
+
+</body>
+</html>

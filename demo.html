@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BK AI Workplace — Bridge デモ</title>
+<style>
+  :root {
+    --bg: #0f0f23;
+    --sidebar: #1a1a2e;
+    --chat-bg: #16162a;
+    --input-bg: #1e1e3a;
+    --accent: #6366f1;
+    --accent2: #ec4899;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --green: #4ade80;
+    --orange: #fb923c;
+    --red: #f87171;
+    --border: rgba(255,255,255,0.06);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 260px;
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .sidebar-header {
+    padding: 20px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sidebar-header .logo {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; font-weight: 800; color: white;
+  }
+  .sidebar-header .name { font-weight: 700; font-size: 0.95rem; }
+  .sidebar-header .name small { display: block; font-size: 0.7rem; color: var(--muted); font-weight: 400; }
+
+  .new-chat {
+    margin: 12px 12px 8px;
+    padding: 10px 14px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: left;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .new-chat:hover { opacity: 0.9; }
+
+  .chat-list { flex: 1; overflow-y: auto; padding: 8px; }
+  .chat-item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    cursor: pointer;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .chat-item:hover { background: rgba(255,255,255,0.05); }
+  .chat-item.active { background: rgba(99,102,241,0.15); color: var(--text); }
+  .chat-date { font-size: 0.7rem; color: var(--muted); padding: 12px 12px 4px; font-weight: 600; }
+
+  .sidebar-footer {
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--orange));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700; color: white;
+  }
+  .user-info { font-size: 0.8rem; }
+  .user-info .role-tag {
+    font-size: 0.65rem;
+    background: rgba(236,72,153,0.2);
+    color: var(--accent2);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  /* ── Main Chat ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .chat-header {
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .chat-header h2 { font-size: 1rem; font-weight: 600; }
+  .model-badge {
+    font-size: 0.75rem;
+    background: rgba(99,102,241,0.15);
+    color: var(--accent);
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .msg { max-width: 800px; width: 100%; margin: 0 auto; display: flex; gap: 14px; }
+  .msg.user { justify-content: flex-end; }
+  .msg.user .bubble {
+    background: var(--accent);
+    color: white;
+    border-radius: 16px 16px 4px 16px;
+    padding: 12px 18px;
+    max-width: 500px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  .msg.ai .ai-avatar {
+    width: 32px; height: 32px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+  }
+  .msg.ai .bubble {
+    background: var(--chat-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px 16px 16px 16px;
+    padding: 18px 22px;
+    max-width: 680px;
+    font-size: 0.93rem;
+    line-height: 1.8;
+  }
+  .msg.ai .bubble h3 {
+    font-size: 1rem;
+    color: var(--accent2);
+    margin: 16px 0 8px;
+    font-weight: 700;
+  }
+  .msg.ai .bubble h3:first-child { margin-top: 0; }
+  .msg.ai .bubble ul {
+    padding-left: 20px;
+    margin: 4px 0;
+  }
+  .msg.ai .bubble li {
+    margin: 4px 0;
+    color: var(--muted);
+  }
+  .msg.ai .bubble li strong { color: var(--text); }
+  .msg.ai .bubble .metric {
+    display: inline-block;
+    background: rgba(99,102,241,0.12);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    color: var(--accent);
+    font-size: 0.85rem;
+  }
+  .msg.ai .bubble .warn {
+    display: inline-block;
+    background: rgba(251,146,60,0.12);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    color: var(--orange);
+    font-size: 0.85rem;
+  }
+  .msg.ai .bubble .critical {
+    display: inline-block;
+    background: rgba(248,113,113,0.12);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    color: var(--red);
+    font-size: 0.85rem;
+  }
+  .msg.ai .bubble .ok {
+    display: inline-block;
+    background: rgba(74,222,128,0.12);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    color: var(--green);
+    font-size: 0.85rem;
+  }
+  .msg.ai .bubble .source {
+    margin-top: 12px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+  }
+  .msg.ai .bubble .source span {
+    background: rgba(255,255,255,0.06);
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 4px;
+  }
+
+  /* ── Typing indicator ── */
+  .typing { display: flex; gap: 4px; padding: 8px 0; }
+  .typing span {
+    width: 6px; height: 6px;
+    background: var(--muted);
+    border-radius: 50%;
+    animation: blink 1.4s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100% { opacity: 0.3; } 40% { opacity: 1; } }
+
+  /* ── Input ── */
+  .input-area {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+  }
+  .input-wrap {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    gap: 8px;
+  }
+  .input-wrap input {
+    flex: 1;
+    background: var(--input-bg);
+    border: 1px solid rgba(99,102,241,0.2);
+    color: var(--text);
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    outline: none;
+  }
+  .input-wrap input:focus { border-color: var(--accent); }
+  .input-wrap input::placeholder { color: var(--muted); }
+  .send-btn {
+    background: var(--accent);
+    border: none;
+    color: white;
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .send-btn:hover { opacity: 0.9; }
+  .input-hint {
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* ── Dashboard Panel ── */
+  .panel {
+    width: 320px;
+    background: var(--sidebar);
+    border-left: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 20px 16px;
+    flex-shrink: 0;
+  }
+  .panel h3 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .panel-card {
+    background: var(--chat-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .panel-card .label { font-size: 0.75rem; color: var(--muted); margin-bottom: 4px; }
+  .panel-card .value { font-size: 1.5rem; font-weight: 800; }
+  .panel-card .value.good { color: var(--green); }
+  .panel-card .value.warn { color: var(--orange); }
+  .panel-card .value.bad { color: var(--red); }
+  .panel-card .sub { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+
+  .progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+  .progress-bar .fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s ease;
+  }
+
+  .blocker-item {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+  }
+  .blocker-item:last-child { border: none; }
+  .blocker-item .title { color: var(--text); font-weight: 600; }
+  .blocker-item .detail { color: var(--muted); margin-top: 2px; }
+  .blocker-item .badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+  .badge.urgent { background: rgba(248,113,113,0.15); color: var(--red); }
+  .badge.waiting { background: rgba(251,146,60,0.15); color: var(--orange); }
+
+  /* ── Role Tabs ── */
+  .role-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--input-bg);
+    padding: 4px;
+    border-radius: 10px;
+  }
+  .role-tab {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--muted);
+    border: none;
+    background: transparent;
+    transition: all 0.2s;
+  }
+  .role-tab.active {
+    background: var(--accent);
+    color: white;
+  }
+  .role-tab:hover:not(.active) {
+    background: rgba(255,255,255,0.06);
+  }
+
+  /* ── Demo banner ── */
+  .demo-banner {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    color: white;
+    text-align: center;
+    padding: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    z-index: 1000;
+    letter-spacing: 0.03em;
+  }
+  body { padding-top: 28px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 1100px) { .panel { display: none; } }
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .msg.ai .bubble { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="demo-banner">DEMO — ロール切替で経営層・エンジニア・デザイナーの異なる体験を確認できます</div>
+
+<!-- ── Sidebar ── -->
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">B</div>
+    <div class="name">BK AI Workplace<small>Bridge v1.1</small></div>
+  </div>
+  <button class="new-chat" id="newChatBtn">+ 新しいチャット</button>
+  <div class="chat-list">
+    <div class="chat-date">今日</div>
+    <div class="chat-item active">bk-pay-match の進捗確認</div>
+    <div class="chat-item">Q1 全プロジェクト概要</div>
+    <div class="chat-date">昨日</div>
+    <div class="chat-item">決済チームのブロッカー</div>
+    <div class="chat-item">AIコスト分析</div>
+    <div class="chat-date">3月5日</div>
+    <div class="chat-item">リリース予定の確認</div>
+    <div class="chat-item">開発チームへのリソース要求</div>
+  </div>
+  <div class="sidebar-footer" id="sidebarFooter">
+    <div class="avatar" id="userAvatar">KK</div>
+    <div class="user-info">
+      <div id="userName">KK（経営企画）</div>
+      <span class="role-tag" id="userRoleTag">経営層</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Main Chat ── -->
+<div class="main">
+  <div class="chat-header">
+    <h2 id="chatTitle">bk-pay-match の進捗確認</h2>
+    <div class="role-tabs" id="roleTabs">
+      <button class="role-tab active" data-role="management">💼 経営層</button>
+      <button class="role-tab" data-role="engineer">💻 エンジニア</button>
+      <button class="role-tab" data-role="designer">🎨 デザイナー</button>
+    </div>
+  </div>
+
+  <!-- Management messages (default) -->
+  <div class="messages" id="management-messages">
+    <!-- Message 1: User -->
+    <div class="msg user">
+      <div class="bubble">bk-pay-matchの現在の進捗を教えて</div>
+    </div>
+
+    <!-- Message 2: AI -->
+    <div class="msg ai">
+      <div class="ai-avatar">🤖</div>
+      <div class="bubble">
+        <h3>📊 bk-pay-match — プロジェクト進捗</h3>
+        <ul>
+          <li><strong>全体完了率: </strong><span class="metric">78% (18/23 タスク完了)</span></li>
+          <li><strong>今週の完了数: </strong><span class="ok">5件完了 ↑</span>（先週比 +2）</li>
+          <li><strong>進行中: </strong>3件</li>
+          <li><strong>スプリント進捗: </strong>Sprint 12 — <span class="metric">75%消化</span>（残り4日）</li>
+        </ul>
+
+        <h3>⚠️ 注意が必要な項目</h3>
+        <ul>
+          <li><span class="critical">要判断</span> <strong>決済機能のコード確認が承認待ち</strong> — 2日間停滞中。<strong>2日以内の判断</strong>がないとリリースに影響</li>
+          <li><span class="warn">依存待ち</span> <strong>外部決済API仕様の確定待ち</strong> — パートナー企業からの回答待ち。フォローアップ推奨</li>
+        </ul>
+
+        <h3>💰 コスト状況</h3>
+        <ul>
+          <li>今月のAI利用コスト: <span class="metric">$1,200 / $2,000 予算</span>（60%消化）</li>
+          <li>開発リソース: 4名稼働中（計画通り）</li>
+        </ul>
+
+        <h3>📋 経営判断が必要な事項</h3>
+        <ul>
+          <li>1. 決済機能の<strong>承認判断</strong>（期限: 3月11日）</li>
+          <li>2. 外部API連携の<strong>パートナーフォローアップ</strong>の指示</li>
+        </ul>
+
+        <div class="source">データソース: <span>Issues</span> <span>Pull Requests</span> <span>Sprints</span> <span>Deployments</span></div>
+      </div>
+    </div>
+
+    <!-- Message 3: User -->
+    <div class="msg user">
+      <div class="bubble">ブロッカーの詳細と、解消にかかる見込み期間は？</div>
+    </div>
+
+    <!-- Message 4: AI -->
+    <div class="msg ai">
+      <div class="ai-avatar">🤖</div>
+      <div class="bubble">
+        <h3>🚧 ブロッカー詳細</h3>
+
+        <h3>1. 決済機能の承認待ち <span class="critical">経営判断が必要</span></h3>
+        <ul>
+          <li><strong>内容:</strong> 決済処理のコア機能が開発完了し、技術確認（レビュー）待ちの状態</li>
+          <li><strong>停滞期間:</strong> 2日間</li>
+          <li><strong>影響:</strong> この承認がないと後続の3つのタスクに着手できない</li>
+          <li><strong>解消見込み:</strong> 承認後 <span class="ok">即日〜1日</span> で開発再開可能</li>
+          <li><strong>推奨アクション:</strong> 技術責任者にレビュー優先度を上げるよう指示</li>
+        </ul>
+
+        <h3>2. 外部決済API仕様 <span class="warn">パートナー依存</span></h3>
+        <ul>
+          <li><strong>内容:</strong> 連携先の決済サービスからAPI仕様書の最終版が届いていない</li>
+          <li><strong>停滞期間:</strong> 5日間</li>
+          <li><strong>影響:</strong> 決済連携機能の実装開始が遅延</li>
+          <li><strong>解消見込み:</strong> 仕様確定後 <span class="warn">3〜5営業日</span> で実装完了</li>
+          <li><strong>推奨アクション:</strong> パートナーへの催促メール + 期限設定</li>
+        </ul>
+
+        <h3>📅 リリースへの影響</h3>
+        <ul>
+          <li>ブロッカー #1 が今週中に解消: <span class="ok">予定通りリリース可能</span></li>
+          <li>ブロッカー #2 が来週まで未解決: <span class="warn">リリース1週間遅延の可能性</span></li>
+          <li>両方が来週末まで未解決: <span class="critical">リリース2週間遅延</span></li>
+        </ul>
+
+        <div class="source">データソース: <span>Issues</span> <span>Pull Requests</span></div>
+      </div>
+    </div>
+
+    <!-- Message 5: User -->
+    <div class="msg user">
+      <div class="bubble">チームが今求めていることは？</div>
+    </div>
+
+    <!-- Message 6: AI (Needs Analysis) -->
+    <div class="msg ai">
+      <div class="ai-avatar">🤖</div>
+      <div class="bubble">
+        <h3>🤝 ニーズ分析 — bk-pay-match</h3>
+
+        <h3>💼 エンジニアチームが経営層に求めていること</h3>
+        <ul>
+          <li><span class="critical">最優先</span> <strong>決済機能レビューの承認判断</strong> — 2日間ブロック中。開発メンバー2名の手が止まっている</li>
+          <li><span class="warn">高</span> <strong>外部パートナーへのエスカレーション</strong> — API仕様の遅延を経営レベルで解決してほしい</li>
+          <li><strong>技術的負債の解消に2スプリント</strong> — 過去の暫定対応が蓄積し、新機能の開発速度が20%低下。改善投資を承認してほしい</li>
+          <li><strong>QA環境のサーバー増強</strong> — テスト実行時間が長くなりリリース前検証がボトルネックに</li>
+        </ul>
+
+        <h3>💼 経営層がエンジニアチームに求めていること</h3>
+        <ul>
+          <li><strong>週次進捗レポートの精度向上</strong> — 完了率だけでなくリスクの早期共有（→ Bridge が自動化済み）</li>
+          <li><strong>コスト見通しの提示</strong> — AI利用コストが予算の60%に達しており、月末着地見込みの報告</li>
+          <li><strong>リリース日の確約</strong> — クライアントへの案内に必要</li>
+        </ul>
+
+        <h3>💡 Bridge の提案</h3>
+        <ul>
+          <li>ブロッカー #1 を今日中に解消すれば、チームの生産性が<strong>即座に回復</strong></li>
+          <li>技術的負債への2スプリント投資は、中期的に開発速度<strong>20%改善</strong>（ROI: 3ヶ月で回収見込み）</li>
+        </ul>
+
+        <div class="source">データソース: <span>Issues</span> <span>Pull Requests</span> <span>Sprints</span> <span>AI分析</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Engineer messages (hidden by default) -->
+  <div class="messages" id="engineer-messages" style="display:none;">
+    <div class="msg user">
+      <div class="bubble">bk-pay-matchの技術的な状況を教えて</div>
+    </div>
+
+    <div class="msg ai">
+      <div class="ai-avatar">🤖</div>
+      <div class="bubble">
+        <h3>🔧 bk-pay-match — 技術サマリー</h3>
+        <ul>
+          <li><strong>Sprint 12:</strong> <span class="metric">18/24 Issue完了 (75%)</span></li>
+          <li><strong>ブロッカー:</strong> <span class="critical">BK-89</span> (DB migration依存、PR #156 待ち)、<span class="warn">BK-102</span> (外部API仕様未確定)</li>
+          <li><strong>PRレビュー待ち:</strong> #156 (2日), #159 (1日), #163 (本日)</li>
+          <li><strong>DORA指標:</strong> デプロイ頻度 <span class="ok">3.2回/週 (↑12%)</span>, MTTR <span class="metric">2.1h</span></li>
+          <li><strong>CI/CD:</strong> 最終パイプライン成功、テストカバレッジ <span class="metric">82%</span></li>
+        </ul>
+        <div class="source">データソース: <span>Issues</span> <span>Pull Requests</span> <span>CICD Deployments</span></div>
+      </div>
+    </div>
+
+    <div class="msg user">
+      <div class="bubble">コスト削減って経営が言ってるけど、具体的に何すればいい？</div>
+    </div>
+
+    <div class="msg ai">
+      <div class="ai-avatar">🤖</div>
+      <div class="bubble">
+        <h3>💡 「コスト削減」の技術的アクション</h3>
+        <ul>
+          <li><strong>経営層の意図:</strong> AI利用コストが予算の<span class="warn">60%</span>に到達、月末超過リスク</li>
+        </ul>
+
+        <h3>🔧 技術的対策</h3>
+        <ul>
+          <li><strong>定型レビューを claude-haiku に切替</strong> → <span class="ok">月$400削減見込み</span></li>
+          <li><strong>不要なAPIコール削減:</strong> キャッシュTTL設定見直し</li>
+          <li><strong>インフラ:</strong> 未使用のstaging環境を停止 → <span class="ok">月$150削減</span></li>
+        </ul>
+        <div class="source">データソース: <span>LiteLLM</span> <span>Langfuse</span> <span>AI Analysis</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Designer messages (hidden by default) -->
+  <div class="messages" id="designer-messages" style="display:none;">
+    <div class="msg user">
+      <div class="bubble">LP画面のデザイン進捗を教えて</div>
+    </div>
+
+    <div class="msg ai">
+      <div class="ai-avatar">🤖</div>
+      <div class="bubble">
+        <h3>🎨 LP画面 — デザイン状況</h3>
+        <ul>
+          <li><strong>コンポーネント完成率:</strong> <span class="metric">85% (42/50コンポーネント)</span></li>
+          <li><strong>Figma未解決コメント:</strong> <span class="warn">3件</span>
+            <ul>
+              <li>ボタンhover状態のカラー定義 — @田中 がコメント</li>
+              <li>LP配色のコントラスト比 — <span class="ok">WCAG AA基準到達済み</span></li>
+              <li>フッターのレスポンシブ — <span class="warn">スマホ版レイアウト未確定</span></li>
+            </ul>
+          </li>
+          <li><strong>エンジニアハンドオフ状況:</strong> <span class="warn">5コンポーネント実装待ち</span></li>
+        </ul>
+        <div class="source">データソース: <span>Figma Components</span> <span>Figma Comments</span> <span>Issues</span></div>
+      </div>
+    </div>
+
+    <div class="msg user">
+      <div class="bubble">経営層が求めていることをデザイン的に教えて</div>
+    </div>
+
+    <div class="msg ai">
+      <div class="ai-avatar">🤖</div>
+      <div class="bubble">
+        <h3>💡 デザイン観点のニーズ分析</h3>
+
+        <h3>💼 経営層→デザイナー</h3>
+        <ul>
+          <li><strong>コンバージョン率向上</strong>のためLP上部のCTAボタンを目立たせたい</li>
+          <li><strong>ブランドカラーの一貫性</strong>を全ページで保ちたい</li>
+        </ul>
+
+        <h3>💻 エンジニア→デザイナー</h3>
+        <ul>
+          <li><strong>レスポンシブのブレイクポイント定義</strong>が欲しい (768px, 1024px)</li>
+          <li><strong>デザイントークン</strong> (色コード、余白、フォントサイズ) をJSON化してほしい</li>
+        </ul>
+
+        <h3>🌉 Bridge提案</h3>
+        <ul>
+          <li>デザインシステムのトークンJSON化は工数<span class="metric">1日</span>で開発効率<span class="ok">20%向上</span>見込み</li>
+        </ul>
+        <div class="source">データソース: <span>Figma Components</span> <span>Figma Comments</span> <span>Issues</span> <span>AI Analysis</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="input-area">
+    <div class="input-wrap">
+      <input type="text" id="userInput" placeholder="プロジェクトについて質問してください..." />
+      <button class="send-btn" id="sendBtn">➤</button>
+    </div>
+    <div class="input-hint" id="inputHint">Bridge が自動でビジネス言語に変換して回答します</div>
+  </div>
+</div>
+
+<!-- ── Right Panel (Dashboard) ── -->
+<div class="panel" id="rightPanel">
+  <h3>📊 bk-pay-match</h3>
+
+  <div class="panel-card">
+    <div class="label">全体進捗</div>
+    <div class="value good">78%</div>
+    <div class="progress-bar"><div class="fill" style="width:78%; background: var(--green);"></div></div>
+    <div class="sub">18/23 タスク完了</div>
+  </div>
+
+  <div class="panel-card">
+    <div class="label">Sprint 12 消化率</div>
+    <div class="value good">75%</div>
+    <div class="progress-bar"><div class="fill" style="width:75%; background: var(--accent);"></div></div>
+    <div class="sub">残り4日</div>
+  </div>
+
+  <div class="panel-card">
+    <div class="label">AI利用コスト（今月）</div>
+    <div class="value warn">$1,200</div>
+    <div class="progress-bar"><div class="fill" style="width:60%; background: var(--orange);"></div></div>
+    <div class="sub">予算 $2,000 の 60%</div>
+  </div>
+
+  <div class="panel-card">
+    <div class="label">デプロイ成功率</div>
+    <div class="value good">96%</div>
+    <div class="sub">直近14日: 12回デプロイ</div>
+  </div>
+
+  <h3 style="margin-top: 20px;">🚧 ブロッカー</h3>
+  <div class="panel-card" style="padding: 0 14px;">
+    <div class="blocker-item">
+      <div class="title"><span class="badge urgent">要判断</span> 決済機能の承認待ち</div>
+      <div class="detail">2日経過 — 経営判断が必要</div>
+    </div>
+    <div class="blocker-item">
+      <div class="title"><span class="badge waiting">依存</span> 外部API仕様待ち</div>
+      <div class="detail">5日経過 — パートナー回答待ち</div>
+    </div>
+  </div>
+
+  <h3 style="margin-top: 20px;">📈 DORA指標</h3>
+  <div class="panel-card">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+      <div><div class="label">デプロイ頻度</div><div style="font-weight:700; color:var(--green);">3.2回/週</div></div>
+      <div><div class="label">変更リードタイム</div><div style="font-weight:700; color:var(--green);">4.2時間</div></div>
+    </div>
+    <div style="display: flex; justify-content: space-between;">
+      <div><div class="label">障害復旧時間</div><div style="font-weight:700; color:var(--orange);">2.1時間</div></div>
+      <div><div class="label">変更失敗率</div><div style="font-weight:700; color:var(--green);">4.2%</div></div>
+    </div>
+  </div>
+
+  <!-- Figma section (shown for designer role) -->
+  <div id="figmaPanel" style="display:none;">
+    <h3 style="margin-top: 20px;">🎨 Figmaステータス</h3>
+    <div class="panel-card">
+      <div class="label">コンポーネント完成率</div>
+      <div class="value good">85%</div>
+      <div class="progress-bar"><div class="fill" style="width:85%; background: var(--green);"></div></div>
+      <div class="sub">42/50 コンポーネント</div>
+    </div>
+    <div class="panel-card">
+      <div class="label">未解決コメント</div>
+      <div class="value warn">3件</div>
+      <div class="sub">直近1週間: 8件解決済み</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Role configuration ──
+  const roleConfig = {
+    management: {
+      title: 'bk-pay-match の進捗確認',
+      userName: 'KK（経営企画）',
+      avatarText: 'KK',
+      roleTag: '経営層',
+      inputHint: 'Bridge が自動でビジネス言語に変換して回答します',
+      showFigma: false,
+    },
+    engineer: {
+      title: 'bk-pay-match 技術状況',
+      userName: 'YT（開発チーム）',
+      avatarText: 'YT',
+      roleTag: 'エンジニア',
+      inputHint: 'Bridge がプロジェクトデータを参照して技術詳細を含めて回答します',
+      showFigma: false,
+    },
+    designer: {
+      title: 'LP画面 デザイン進捗',
+      userName: 'MS（デザインチーム）',
+      avatarText: 'MS',
+      roleTag: 'デザイナー',
+      inputHint: 'Bridge がFigmaデータを参照してデザイン観点で回答します',
+      showFigma: true,
+    },
+  };
+
+  // ── Demo responses per role ──
+  const managementResponses = {
+    'default': `<h3>📊 回答</h3>
+<p>ご質問を受け付けました。プロジェクトデータを分析中です。</p>
+<p>実環境では DevLake のデータと LLM を使って、ビジネス言語で回答を生成します。</p>
+<div class="source">このデモでは定型応答を表示しています</div>`,
+    'コスト': `<h3>💰 AIコスト分析</h3>
+<ul>
+<li><strong>今月累計:</strong> <span class="metric">$1,200</span>（予算$2,000の60%）</li>
+<li><strong>日別平均:</strong> $133/日（9日経過）</li>
+<li><strong>月末見込み:</strong> <span class="warn">$1,850〜$2,100</span></li>
+<li><strong>最多利用:</strong> コードレビュー支援（45%）、ドキュメント生成（30%）</li>
+</ul>
+<h3>💡 コスト最適化の提案</h3>
+<ul>
+<li>定型的なコードレビューは軽量モデル（Haiku）に切替 → <span class="ok">月$400削減見込み</span></li>
+</ul>
+<div class="source">データソース: <span>LiteLLM</span> <span>Langfuse</span></div>`,
+    'リリース': `<h3>📅 リリース予定</h3>
+<ul>
+<li><strong>予定リリース日:</strong> <span class="metric">3月21日（金）</span></li>
+<li><strong>現在の達成度:</strong> 78% → 残り5タスク</li>
+<li><strong>リスク:</strong> ブロッカー2件が今週中に解消されない場合、<span class="warn">3月28日に延期</span></li>
+</ul>
+<h3>📋 リリースまでのマイルストーン</h3>
+<ul>
+<li>3月11日: 決済機能の承認判断（経営）</li>
+<li>3月14日: 外部API連携の実装完了</li>
+<li>3月18日: QAテスト完了</li>
+<li>3月21日: 本番リリース</li>
+</ul>
+<div class="source">データソース: <span>Issues</span> <span>Sprints</span></div>`,
+  };
+
+  const engineerResponses = {
+    'default': `<h3>🔧 回答</h3>
+<p>プロジェクトデータを参照して技術的な回答を生成中です。</p>
+<p>実環境では DevLake + GitHub データを使って、技術詳細を含めて回答します。</p>
+<div class="source">このデモでは定型応答を表示しています</div>`,
+    'ブロッカー': `<h3>🚧 技術ブロッカー詳細</h3>
+<ul>
+<li><span class="critical">BK-89</span> <strong>DB migration依存</strong> — PR #156 のレビュー待ち（2日）。migration スクリプトに breaking change あり、staging で検証必要</li>
+<li><span class="warn">BK-102</span> <strong>外部API仕様未確定</strong> — エンドポイント /v2/payments のリクエスト形式が未定義。モックで開発継続中</li>
+</ul>
+<h3>💡 回避策</h3>
+<ul>
+<li>BK-89: feature flag で migration を段階適用する方法を検討中</li>
+<li>BK-102: OpenAPI spec のドラフトをベースに interface 定義済み</li>
+</ul>
+<div class="source">データソース: <span>Issues</span> <span>Pull Requests</span></div>`,
+    'CI': `<h3>🔄 CI/CDパイプライン状況</h3>
+<ul>
+<li><strong>最終ビルド:</strong> <span class="ok">成功</span>（3月9日 14:32）</li>
+<li><strong>テストカバレッジ:</strong> <span class="metric">82%</span>（目標: 80%）</li>
+<li><strong>平均ビルド時間:</strong> 4分12秒（先週比 -8%）</li>
+<li><strong>直近14日のデプロイ:</strong> 12回（成功率 <span class="ok">96%</span>）</li>
+<li><strong>失敗した1回:</strong> env変数の設定漏れ（即時修正済み）</li>
+</ul>
+<div class="source">データソース: <span>CICD Deployments</span> <span>GitHub Actions</span></div>`,
+    'テスト': `<h3>🧪 テストカバレッジレポート</h3>
+<ul>
+<li><strong>全体カバレッジ:</strong> <span class="metric">82%</span></li>
+<li><strong>ユニットテスト:</strong> <span class="ok">89%</span>（231/260 関数）</li>
+<li><strong>統合テスト:</strong> <span class="warn">72%</span>（18/25 シナリオ）</li>
+<li><strong>E2Eテスト:</strong> <span class="warn">65%</span>（13/20 フロー）</li>
+</ul>
+<h3>⚠️ カバレッジ不足の領域</h3>
+<ul>
+<li>決済処理モジュール（新規追加分のテスト未作成）</li>
+<li>エラーハンドリングのエッジケース</li>
+</ul>
+<div class="source">データソース: <span>GitHub Actions</span> <span>Jest Coverage</span></div>`,
+  };
+
+  const designerResponses = {
+    'default': `<h3>🎨 回答</h3>
+<p>Figmaデータを参照してデザイン観点の回答を生成中です。</p>
+<p>実環境では Figma API + DevLake データを使って、デザイン進捗を含めて回答します。</p>
+<div class="source">このデモでは定型応答を表示しています</div>`,
+    'デザイン': `<h3>🎨 デザイン進捗サマリー</h3>
+<ul>
+<li><strong>コンポーネント完成率:</strong> <span class="metric">85% (42/50)</span></li>
+<li><strong>残りコンポーネント:</strong> モーダル(2), トースト通知(1), テーブルソート(2), ページネーション(1), エラー画面(2)</li>
+<li><strong>デザインレビュー:</strong> 今週5件完了、来週8件予定</li>
+<li><strong>ハンドオフ済み:</strong> 37コンポーネント（エンジニア実装待ち: 5件）</li>
+</ul>
+<div class="source">データソース: <span>Figma Components</span> <span>Figma Comments</span></div>`,
+    'Figma': `<h3>📐 Figmaコンポーネントステータス</h3>
+<ul>
+<li><strong>完成:</strong> <span class="ok">42コンポーネント</span></li>
+<li><strong>レビュー中:</strong> <span class="warn">5コンポーネント</span></li>
+<li><strong>未着手:</strong> <span class="critical">3コンポーネント</span></li>
+<li><strong>未解決コメント:</strong> 3件（ボタンhover、コントラスト比、レスポンシブ）</li>
+<li><strong>Figmaページ数:</strong> 12ページ（Desktop 6, Mobile 4, Tablet 2）</li>
+</ul>
+<div class="source">データソース: <span>Figma Components</span> <span>Figma Comments</span></div>`,
+    'トークン': `<h3>🎨 デザイントークン情報</h3>
+<ul>
+<li><strong>定義済みトークン:</strong> <span class="metric">78個</span></li>
+<li><strong>カラー:</strong> 24トークン（Primary 6, Secondary 6, Neutral 8, Semantic 4）</li>
+<li><strong>スペーシング:</strong> 12トークン（4px〜96px）</li>
+<li><strong>タイポグラフィ:</strong> 18トークン（見出し6, 本文6, キャプション6）</li>
+<li><strong>JSON化状態:</strong> <span class="warn">未実施</span> — 工数1日で対応可能</li>
+</ul>
+<h3>💡 提案</h3>
+<ul>
+<li>トークンJSON化 → エンジニアのCSS変数自動生成で<span class="ok">実装工数20%削減</span></li>
+</ul>
+<div class="source">データソース: <span>Figma Styles</span> <span>AI Analysis</span></div>`,
+  };
+
+  const allResponses = {
+    management: managementResponses,
+    engineer: engineerResponses,
+    designer: designerResponses,
+  };
+
+  // ── State ──
+  let currentRole = 'management';
+
+  // ── DOM refs ──
+  const input = document.getElementById('userInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const chatTitle = document.getElementById('chatTitle');
+  const inputHint = document.getElementById('inputHint');
+  const userAvatar = document.getElementById('userAvatar');
+  const userName = document.getElementById('userName');
+  const userRoleTag = document.getElementById('userRoleTag');
+  const figmaPanel = document.getElementById('figmaPanel');
+  const roleTabs = document.getElementById('roleTabs');
+
+  function getActiveMessages() {
+    return document.getElementById(currentRole + '-messages');
+  }
+
+  // ── Tab switching ──
+  roleTabs.addEventListener('click', (e) => {
+    const tab = e.target.closest('.role-tab');
+    if (!tab || tab.dataset.role === currentRole) return;
+
+    // Hide current messages
+    document.getElementById(currentRole + '-messages').style.display = 'none';
+
+    // Update active tab
+    roleTabs.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+
+    // Switch role
+    currentRole = tab.dataset.role;
+    const config = roleConfig[currentRole];
+
+    // Show new messages
+    const messagesEl = document.getElementById(currentRole + '-messages');
+    messagesEl.style.display = 'flex';
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    // Update UI
+    chatTitle.textContent = config.title;
+    inputHint.textContent = config.inputHint;
+    userAvatar.textContent = config.avatarText;
+    userName.textContent = config.userName;
+    userRoleTag.textContent = config.roleTag;
+    figmaPanel.style.display = config.showFigma ? 'block' : 'none';
+  });
+
+  // ── Messaging ──
+  function addMessage(text, isUser) {
+    const messagesEl = getActiveMessages();
+    const msg = document.createElement('div');
+    msg.className = `msg ${isUser ? 'user' : 'ai'}`;
+    if (isUser) {
+      msg.innerHTML = `<div class="bubble">${escapeHtml(text)}</div>`;
+    } else {
+      msg.innerHTML = `<div class="ai-avatar">🤖</div><div class="bubble">${text}</div>`;
+    }
+    messagesEl.appendChild(msg);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function addTyping() {
+    const messagesEl = getActiveMessages();
+    const msg = document.createElement('div');
+    msg.className = 'msg ai';
+    msg.id = 'typing';
+    msg.innerHTML = `<div class="ai-avatar">🤖</div><div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+    messagesEl.appendChild(msg);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function removeTyping() {
+    const el = document.getElementById('typing');
+    if (el) el.remove();
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function getResponse(text) {
+    const lower = text.toLowerCase();
+    const responses = allResponses[currentRole];
+    for (const [key, val] of Object.entries(responses)) {
+      if (key !== 'default' && lower.includes(key.toLowerCase())) return val;
+    }
+    return responses['default'];
+  }
+
+  function send() {
+    const text = input.value.trim();
+    if (!text) return;
+    addMessage(text, true);
+    input.value = '';
+    addTyping();
+    setTimeout(() => {
+      removeTyping();
+      addMessage(getResponse(text), false);
+    }, 1200 + Math.random() * 800);
+  }
+
+  sendBtn.addEventListener('click', send);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') send(); });
+
+  // Scroll to bottom on load
+  document.getElementById('management-messages').scrollTop = document.getElementById('management-messages').scrollHeight;
+</script>
+
+</body>
+</html>
