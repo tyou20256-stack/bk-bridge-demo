@@ -181,6 +181,7 @@
   }
   .form-group input[type="text"],
   .form-group input[type="url"],
+  .form-group input[type="password"],
   .form-group input[type="number"],
   .form-group select,
   .form-group textarea {
@@ -390,15 +391,15 @@
   <!-- Side Tabs -->
   <div class="side-tabs">
     <h3>ロール設定</h3>
-    <button class="tab-btn active" onclick="switchTab('engineer')">
+    <button class="tab-btn active" onclick="switchTab('engineer', event)">
       <span class="tab-icon">💻</span> エンジニア
       <span class="tab-badge badge-eng">ENG</span>
     </button>
-    <button class="tab-btn" onclick="switchTab('designer')">
+    <button class="tab-btn" onclick="switchTab('designer', event)">
       <span class="tab-icon">🎨</span> デザイナー
       <span class="tab-badge badge-des">DES</span>
     </button>
-    <button class="tab-btn" onclick="switchTab('management')">
+    <button class="tab-btn" onclick="switchTab('management', event)">
       <span class="tab-icon">📈</span> 経営層
       <span class="tab-badge badge-mng">MGR</span>
     </button>
@@ -531,7 +532,7 @@
         <div class="form-row">
           <div class="form-group">
             <label>Figma API トークン <span class="optional">（任意）</span></label>
-            <input type="text" id="des-figma-token" placeholder="figd_xxxxx">
+            <input type="password" id="des-figma-token" placeholder="figd_xxxxx" autocomplete="off">
           </div>
           <div class="form-group">
             <label>プロジェクトID <span class="optional">（任意）</span></label>
@@ -728,11 +729,18 @@
 <div class="toast" id="toast">設定を保存しました</div>
 
 <script>
+// ── Dirty tracking ──
+let currentDirty = false;
+function markDirty() { currentDirty = true; }
+
 // ── Tab switching ──
-function switchTab(role) {
+function switchTab(role, e) {
+  // 未保存チェック
+  if (currentDirty && !confirm('未保存の変更があります。破棄してタブを切り替えますか？')) return;
+  currentDirty = false;
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  event.currentTarget.classList.add('active');
+  e.currentTarget.classList.add('active');
   document.getElementById('panel-' + role).classList.add('active');
 }
 
@@ -754,16 +762,36 @@ document.querySelectorAll('.tags-input').forEach(container => {
 });
 
 function addTag(container, text) {
+  // 重複チェック
+  const existing = getTagValuesFromContainer(container);
+  if (existing.includes(text)) return;
+
   const input = container.querySelector('input');
   const tag = document.createElement('span');
   tag.className = 'tag';
-  tag.innerHTML = text + '<span class="remove" onclick="this.parentElement.remove()">&times;</span>';
+
+  const label = document.createElement('span');
+  label.className = 'tag-label';
+  label.textContent = text;
+
+  const remove = document.createElement('span');
+  remove.className = 'remove';
+  remove.textContent = '\u00d7';
+  remove.addEventListener('click', () => { tag.remove(); markDirty(); });
+
+  tag.appendChild(label);
+  tag.appendChild(remove);
   container.insertBefore(tag, input);
+  markDirty();
+}
+
+function getTagValuesFromContainer(container) {
+  return Array.from(container.querySelectorAll('.tag .tag-label'))
+    .map(t => t.textContent.trim());
 }
 
 function getTagValues(containerId) {
-  return Array.from(document.getElementById(containerId).querySelectorAll('.tag'))
-    .map(t => t.textContent.replace('×', '').trim());
+  return getTagValuesFromContainer(document.getElementById(containerId));
 }
 
 function setTagValues(containerId, values) {
@@ -796,14 +824,29 @@ const FIELDS = {
 };
 
 function savePanel(role) {
+  // URL バリデーション
   const cfg = FIELDS[role];
+  for (const id of cfg.texts) {
+    const el = document.getElementById(id);
+    if (el.type === 'url' && el.value && !isValidUrl(el.value)) {
+      el.focus();
+      showToast('正しいURLを入力してください', true);
+      return;
+    }
+  }
   const data = {};
   cfg.texts.forEach(id => { data[id] = document.getElementById(id).value; });
   cfg.selects.forEach(id => { data[id] = document.getElementById(id).value; });
   cfg.checks.forEach(id => { data[id] = document.getElementById(id).checked; });
   cfg.tags.forEach(id => { data[id] = getTagValues(id); });
   localStorage.setItem('bridge-settings-' + role, JSON.stringify(data));
+  currentDirty = false;
   showToast();
+}
+
+function isValidUrl(str) {
+  try { const u = new URL(str); return ['http:', 'https:'].includes(u.protocol); }
+  catch { return false; }
 }
 
 function loadPanel(role) {
@@ -818,30 +861,39 @@ function loadPanel(role) {
 }
 
 function resetPanel(role) {
+  if (!confirm('この設定をリセットしますか？ 入力済みの値はすべて消去されます。')) return;
   localStorage.removeItem('bridge-settings-' + role);
   const cfg = FIELDS[role];
   cfg.texts.forEach(id => { document.getElementById(id).value = ''; });
   cfg.selects.forEach(id => { document.getElementById(id).selectedIndex = 0; });
   cfg.checks.forEach(id => {
-    // Reset to HTML default
+    // Reset to HTML default checked attribute
     const el = document.getElementById(id);
-    el.checked = el.hasAttribute('data-default') ? el.getAttribute('data-default') === 'true' : false;
+    el.checked = el.defaultChecked;
   });
   cfg.tags.forEach(id => {
     document.getElementById(id).querySelectorAll('.tag').forEach(t => t.remove());
   });
+  currentDirty = false;
   showToast('設定をリセットしました');
 }
 
-function showToast(msg) {
+function showToast(msg, isError) {
   const toast = document.getElementById('toast');
   toast.textContent = msg || '設定を保存しました';
+  toast.style.background = isError ? 'var(--red)' : 'var(--green)';
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2000);
+  setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
 // Load all on page load
 ['engineer', 'designer', 'management'].forEach(loadPanel);
+
+// Dirty tracking for all inputs
+document.querySelectorAll('input, select, textarea').forEach(el => {
+  el.addEventListener('input', markDirty);
+  el.addEventListener('change', markDirty);
+});
 </script>
 </body>
 </html>
