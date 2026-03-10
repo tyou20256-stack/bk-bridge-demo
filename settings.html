@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BK AI Workplace — Bridge 管理画面</title>
+<style>
+  :root {
+    --bg: #0f0f23;
+    --sidebar: #1a1a2e;
+    --surface: #16162a;
+    --card: #1e1e3a;
+    --accent: #6366f1;
+    --accent2: #ec4899;
+    --accent3: #22d3ee;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --green: #4ade80;
+    --orange: #fb923c;
+    --red: #f87171;
+    --border: rgba(255,255,255,0.06);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Top Nav ── */
+  .topnav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--sidebar);
+  }
+  .topnav-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .topnav .logo {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem; font-weight: 800; color: white;
+    text-decoration: none;
+  }
+  .topnav .title {
+    font-weight: 700; font-size: 1rem;
+  }
+  .topnav .title small {
+    display: block; font-size: 0.7rem; color: var(--muted); font-weight: 400;
+  }
+  .back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-link:hover { opacity: 0.8; }
+
+  /* ── Layout ── */
+  .layout {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: calc(100vh - 61px);
+  }
+
+  /* ── Side Tabs ── */
+  .side-tabs {
+    width: 240px;
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    padding: 24px 12px;
+    flex-shrink: 0;
+  }
+  .side-tabs h3 {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0 12px 8px;
+    font-weight: 600;
+  }
+  .tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 0.88rem;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: 2px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .tab-btn:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+  .tab-btn.active { background: rgba(99,102,241,0.15); color: var(--text); font-weight: 600; }
+  .tab-btn .tab-icon { font-size: 1.1rem; width: 24px; text-align: center; }
+  .tab-btn .tab-badge {
+    margin-left: auto;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .badge-eng { background: rgba(34,211,238,0.15); color: var(--accent3); }
+  .badge-des { background: rgba(236,72,153,0.15); color: var(--accent2); }
+  .badge-mng { background: rgba(251,146,60,0.15); color: var(--orange); }
+
+  /* ── Content ── */
+  .content {
+    flex: 1;
+    padding: 32px 40px;
+    overflow-y: auto;
+  }
+  .content-header {
+    margin-bottom: 32px;
+  }
+  .content-header h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .content-header p {
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── Form ── */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .section-desc {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-group:last-child { margin-bottom: 0; }
+  .form-group label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .form-group label .optional {
+    font-weight: 400;
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+  .form-group input[type="text"],
+  .form-group input[type="url"],
+  .form-group input[type="number"],
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 0.88rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--accent);
+  }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-group .hint {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* Tags Input */
+  .tags-input {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 10px;
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    min-height: 42px;
+    cursor: text;
+    transition: border-color 0.2s;
+  }
+  .tags-input:focus-within { border-color: var(--accent); }
+  .tags-input .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(99,102,241,0.15);
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 5px;
+  }
+  .tags-input .tag .remove {
+    cursor: pointer;
+    font-size: 0.9rem;
+    opacity: 0.6;
+    line-height: 1;
+  }
+  .tags-input .tag .remove:hover { opacity: 1; }
+  .tags-input input {
+    flex: 1;
+    min-width: 100px;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 0.85rem;
+    outline: none;
+    padding: 2px 4px;
+  }
+
+  /* Toggle */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .toggle-label small {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+  .toggle {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    cursor: pointer;
+  }
+  .toggle input { display: none; }
+  .toggle .slider {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    transition: background 0.2s;
+  }
+  .toggle .slider::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    left: 3px; top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+  .toggle input:checked + .slider {
+    background: var(--accent);
+  }
+  .toggle input:checked + .slider::after {
+    transform: translateX(20px);
+  }
+
+  /* Buttons */
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    justify-content: flex-end;
+  }
+  .btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    font-family: inherit;
+  }
+  .btn:hover { opacity: 0.9; }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+  .btn-secondary {
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: var(--green);
+    color: #000;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .layout { flex-direction: column; }
+    .side-tabs {
+      width: 100%;
+      flex-direction: row;
+      display: flex;
+      padding: 8px;
+      overflow-x: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .side-tabs h3 { display: none; }
+    .tab-btn { white-space: nowrap; }
+    .content { padding: 24px 16px; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Top Nav -->
+<nav class="topnav">
+  <div class="topnav-left">
+    <a href="index.html" class="logo">B</a>
+    <div class="title">Bridge <small>設定・管理画面</small></div>
+  </div>
+  <a href="index.html" class="back-link">← トップへ戻る</a>
+</nav>
+
+<div class="layout">
+  <!-- Side Tabs -->
+  <div class="side-tabs">
+    <h3>ロール設定</h3>
+    <button class="tab-btn active" onclick="switchTab('engineer')">
+      <span class="tab-icon">💻</span> エンジニア
+      <span class="tab-badge badge-eng">ENG</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('designer')">
+      <span class="tab-icon">🎨</span> デザイナー
+      <span class="tab-badge badge-des">DES</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('management')">
+      <span class="tab-icon">📈</span> 経営層
+      <span class="tab-badge badge-mng">MGR</span>
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- ═══ Engineer Panel ═══ -->
+    <div id="panel-engineer" class="panel active">
+      <div class="content-header">
+        <h2>エンジニア設定</h2>
+        <p>GitHub連携や技術スタックなど、Bridgeがあなたのコンテキストを正しく理解するための情報を設定します。</p>
+      </div>
+
+      <div class="section">
+        <div class="section-title">GitHub連携</div>
+        <div class="section-desc">BridgeがPR・Issue・コード変更を参照し、経営層やデザイナーへ適切に翻訳します。</div>
+        <div class="form-group">
+          <label>リポジトリURL</label>
+          <input type="url" id="eng-repo" placeholder="https://github.com/org/repo">
+          <div class="hint">メインで作業しているリポジトリを指定してください</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>デフォルトブランチ</label>
+            <input type="text" id="eng-branch" placeholder="main">
+          </div>
+          <div class="form-group">
+            <label>ブランチ戦略</label>
+            <select id="eng-branch-strategy">
+              <option value="gitflow">Git Flow</option>
+              <option value="github-flow" selected>GitHub Flow</option>
+              <option value="trunk">Trunk-Based</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">技術スタック</div>
+        <div class="section-desc">使用している技術を登録すると、Bridge が技術用語を正しくコンテキストに含めて翻訳します。</div>
+        <div class="form-group">
+          <label>フレームワーク / 言語</label>
+          <div class="tags-input" id="eng-stack-tags">
+            <input type="text" placeholder="Enter で追加（例: React, TypeScript）">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>インフラ / ツール</label>
+          <div class="tags-input" id="eng-infra-tags">
+            <input type="text" placeholder="Enter で追加（例: AWS, Docker, Terraform）">
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">翻訳プリファレンス</div>
+        <div class="section-desc">Bridge が他ロールの発言をあなたに翻訳するとき、どの情報を重視するか設定します。</div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            技術的実現可能性を強調
+            <small>経営層の要望に対して実装コストや技術的制約を補足</small>
+          </div>
+          <label class="toggle"><input type="checkbox" id="eng-pref-feasibility" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            デザイン意図の技術解説
+            <small>デザイナーの提案をCSS/コンポーネント観点で解説</small>
+          </div>
+          <label class="toggle"><input type="checkbox" id="eng-pref-design" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            パフォーマンス影響の自動算出
+            <small>要件変更時のパフォーマンス影響を自動で注記</small>
+          </div>
+          <label class="toggle"><input type="checkbox" id="eng-pref-perf"><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            見積もり工数を表示
+            <small>翻訳結果に想定工数（SP / 人日）を併記</small>
+          </div>
+          <label class="toggle"><input type="checkbox" id="eng-pref-estimate" checked><span class="slider"></span></label>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">コードレビュー基準</div>
+        <div class="section-desc">Bridge がレビュー関連の翻訳で参照するチームの基準です。</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>テストカバレッジ目標 (%)</label>
+            <input type="number" id="eng-coverage" placeholder="80" min="0" max="100">
+          </div>
+          <div class="form-group">
+            <label>最大PR行数</label>
+            <input type="number" id="eng-pr-lines" placeholder="400">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>レビュー観点メモ <span class="optional">（任意）</span></label>
+          <textarea id="eng-review-notes" placeholder="例: セキュリティ重視、N+1クエリ注意、命名規約はsnake_case..."></textarea>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="resetPanel('engineer')">リセット</button>
+        <button class="btn btn-primary" onclick="savePanel('engineer')">保存する</button>
+      </div>
+    </div>
+
+    <!-- ═══ Designer Panel ═══ -->
+    <div id="panel-designer" class="panel">
+      <div class="content-header">
+        <h2>デザイナー設定</h2>
+        <p>Figma連携やデザインシステムの情報を設定し、Bridgeがデザイン意図を正確に他ロールへ翻訳できるようにします。</p>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Figma連携</div>
+        <div class="section-desc">Figmaファイルを連携すると、BridgeがデザイントークンやコンポーネントをPR翻訳に活用します。</div>
+        <div class="form-group">
+          <label>FigmaファイルURL</label>
+          <input type="url" id="des-figma-url" placeholder="https://www.figma.com/file/xxxxx/ProjectName">
+          <div class="hint">メインのデザインファイルURLを入力してください</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Figma API トークン <span class="optional">（任意）</span></label>
+            <input type="text" id="des-figma-token" placeholder="figd_xxxxx">
+          </div>
+          <div class="form-group">
+            <label>プロジェクトID <span class="optional">（任意）</span></label>
+            <input type="text" id="des-figma-project" placeholder="12345678">
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">デザインシステム</div>
+        <div class="section-desc">使用しているデザインシステムやトークンの情報を登録します。</div>
+        <div class="form-group">
+          <label>デザインシステム名</label>
+          <input type="text" id="des-system-name" placeholder="例: Material Design 3, 社内DS">
+        </div>
+        <div class="form-group">
+          <label>カラートークン（主要）</label>
+          <div class="tags-input" id="des-color-tags">
+            <input type="text" placeholder="Enter で追加（例: primary-500, surface-dark）">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>使用フォント</label>
+          <div class="tags-input" id="des-font-tags">
+            <input type="text" placeholder="Enter で追加（例: Noto Sans JP, Inter）">
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">翻訳プリファレンス</div>
+        <div class="section-desc">Bridge が他ロールの発言をあなたに翻訳するとき、どの情報を重視するか設定します。</div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            UXインパクト分析
+            <small>経営層の要件変更がUXに与える影響を自動で注記</small>
+          </div>
+          <label class="toggle"><input type="checkbox" id="des-pref-ux" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            技術制約のビジュアル説明
+            <small>エンジニアの技術制約をデザイン観点で翻訳（例: z-index制限 → レイヤー構造）</small>
+          </div>
+          <label class="toggle"><input type="checkbox" id="des-pref-tech" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            アクセシビリティチェック
+            <small>翻訳時にWCAG準拠の観点を自動付与</small>
+          </div>
+          <label class="toggle"><input type="checkbox" id="des-pref-a11y"><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            レスポンシブ考慮事項
+            <small>要件変更のレスポンシブ対応への影響を注記</small>
+          </div>
+          <label class="toggle"><input type="checkbox" id="des-pref-responsive" checked><span class="slider"></span></label>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">使用ツール</div>
+        <div class="section-desc">デザインワークフローで使用しているツールを登録します。</div>
+        <div class="form-group">
+          <label>デザインツール</label>
+          <div class="tags-input" id="des-tools-tags">
+            <input type="text" placeholder="Enter で追加（例: Figma, Sketch, Adobe XD）">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>プロトタイピングツール <span class="optional">（任意）</span></label>
+          <div class="tags-input" id="des-proto-tags">
+            <input type="text" placeholder="Enter で追加（例: ProtoPie, Principle）">
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="resetPanel('designer')">リセット</button>
+        <button class="btn btn-primary" onclick="savePanel('designer')">保存する</button>
+      </div>
+    </div>
+
+    <!-- ═══ Management Panel ═══ -->
+    <div id="panel-management" class="panel">
+      <div class="content-header">
+        <h2>経営層設定</h2>
+        <p>KPI指標やレポート設定を行い、Bridgeが技術・デザインの進捗をビジネス観点で翻訳できるようにします。</p>
+      </div>
+
+      <div class="section">
+        <div class="section-title">KPI指標</div>
+        <div class="section-desc">重視しているKPIを登録すると、Bridgeが技術的な報告をKPI文脈で翻訳します。</div>
+        <div class="form-group">
+          <label>重要KPI</label>
+          <div class="tags-input" id="mng-kpi-tags">
+            <input type="text" placeholder="Enter で追加（例: MRR, DAU, Churn Rate）">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>今期の最重要目標</label>
+            <input type="text" id="mng-goal" placeholder="例: ARR 1億円達成">
+          </div>
+          <div class="form-group">
+            <label>報告頻度</label>
+            <select id="mng-report-freq">
+              <option value="daily">毎日</option>
+              <option value="weekly" selected>毎週</option>
+              <option value="biweekly">隔週</option>
+              <option value="monthly">毎月</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">翻訳プリファレンス</div>
+        <div class="section-desc">Bridge がエンジニアやデザイナーの発言をあなたに翻訳するとき、どの情報を重視するか設定します。</div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            ROI / コスト換算
+            <small>技術的な工数をコスト・ROI観点で翻訳</small>
+          </div>
+          <label class="toggle"><input type="checkbox" id="mng-pref-roi" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            スケジュール影響
+            <small>技術的リスクや変更をスケジュール影響として要約</small>
+          </div>
+          <label class="toggle"><input type="checkbox" id="mng-pref-schedule" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            競合比較の文脈追加
+            <small>デザイン提案を競合サービスとの比較で補足</small>
+          </div>
+          <label class="toggle"><input type="checkbox" id="mng-pref-competitive"><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            技術用語の自動簡略化
+            <small>専門用語を平易なビジネス用語に置換</small>
+          </div>
+          <label class="toggle"><input type="checkbox" id="mng-pref-simplify" checked><span class="slider"></span></label>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">レポート設定</div>
+        <div class="section-desc">定期レポートのフォーマットと配信先を設定します。</div>
+        <div class="form-group">
+          <label>レポート形式</label>
+          <select id="mng-report-format">
+            <option value="summary">サマリー（1ページ）</option>
+            <option value="detailed" selected>詳細レポート</option>
+            <option value="dashboard">ダッシュボードリンク</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>配信先（Slack / メール） <span class="optional">（任意）</span></label>
+          <input type="text" id="mng-notify" placeholder="例: #management-reports or ceo@example.com">
+        </div>
+        <div class="form-group">
+          <label>レポートに含める項目</label>
+          <div class="toggle-row">
+            <div class="toggle-label">DORA指標</div>
+            <label class="toggle"><input type="checkbox" id="mng-report-dora" checked><span class="slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-label">デザイン進捗（Figma）</div>
+            <label class="toggle"><input type="checkbox" id="mng-report-figma" checked><span class="slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-label">AI活用状況</div>
+            <label class="toggle"><input type="checkbox" id="mng-report-ai"><span class="slider"></span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="resetPanel('management')">リセット</button>
+        <button class="btn btn-primary" onclick="savePanel('management')">保存する</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">設定を保存しました</div>
+
+<script>
+// ── Tab switching ──
+function switchTab(role) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('panel-' + role).classList.add('active');
+}
+
+// ── Tags input ──
+document.querySelectorAll('.tags-input').forEach(container => {
+  const input = container.querySelector('input');
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && input.value.trim()) {
+      e.preventDefault();
+      addTag(container, input.value.trim());
+      input.value = '';
+    }
+    if (e.key === 'Backspace' && !input.value) {
+      const tags = container.querySelectorAll('.tag');
+      if (tags.length) tags[tags.length - 1].remove();
+    }
+  });
+  container.addEventListener('click', () => input.focus());
+});
+
+function addTag(container, text) {
+  const input = container.querySelector('input');
+  const tag = document.createElement('span');
+  tag.className = 'tag';
+  tag.innerHTML = text + '<span class="remove" onclick="this.parentElement.remove()">&times;</span>';
+  container.insertBefore(tag, input);
+}
+
+function getTagValues(containerId) {
+  return Array.from(document.getElementById(containerId).querySelectorAll('.tag'))
+    .map(t => t.textContent.replace('×', '').trim());
+}
+
+function setTagValues(containerId, values) {
+  const container = document.getElementById(containerId);
+  container.querySelectorAll('.tag').forEach(t => t.remove());
+  (values || []).forEach(v => addTag(container, v));
+}
+
+// ── Save / Load ──
+const FIELDS = {
+  engineer: {
+    texts: ['eng-repo', 'eng-branch', 'eng-coverage', 'eng-pr-lines', 'eng-review-notes'],
+    selects: ['eng-branch-strategy'],
+    checks: ['eng-pref-feasibility', 'eng-pref-design', 'eng-pref-perf', 'eng-pref-estimate'],
+    tags: ['eng-stack-tags', 'eng-infra-tags']
+  },
+  designer: {
+    texts: ['des-figma-url', 'des-figma-token', 'des-figma-project', 'des-system-name'],
+    selects: [],
+    checks: ['des-pref-ux', 'des-pref-tech', 'des-pref-a11y', 'des-pref-responsive'],
+    tags: ['des-color-tags', 'des-font-tags', 'des-tools-tags', 'des-proto-tags']
+  },
+  management: {
+    texts: ['mng-goal', 'mng-notify'],
+    selects: ['mng-report-freq', 'mng-report-format'],
+    checks: ['mng-pref-roi', 'mng-pref-schedule', 'mng-pref-competitive', 'mng-pref-simplify',
+             'mng-report-dora', 'mng-report-figma', 'mng-report-ai'],
+    tags: ['mng-kpi-tags']
+  }
+};
+
+function savePanel(role) {
+  const cfg = FIELDS[role];
+  const data = {};
+  cfg.texts.forEach(id => { data[id] = document.getElementById(id).value; });
+  cfg.selects.forEach(id => { data[id] = document.getElementById(id).value; });
+  cfg.checks.forEach(id => { data[id] = document.getElementById(id).checked; });
+  cfg.tags.forEach(id => { data[id] = getTagValues(id); });
+  localStorage.setItem('bridge-settings-' + role, JSON.stringify(data));
+  showToast();
+}
+
+function loadPanel(role) {
+  const raw = localStorage.getItem('bridge-settings-' + role);
+  if (!raw) return;
+  const data = JSON.parse(raw);
+  const cfg = FIELDS[role];
+  cfg.texts.forEach(id => { if (data[id] !== undefined) document.getElementById(id).value = data[id]; });
+  cfg.selects.forEach(id => { if (data[id] !== undefined) document.getElementById(id).value = data[id]; });
+  cfg.checks.forEach(id => { if (data[id] !== undefined) document.getElementById(id).checked = data[id]; });
+  cfg.tags.forEach(id => { if (data[id]) setTagValues(id, data[id]); });
+}
+
+function resetPanel(role) {
+  localStorage.removeItem('bridge-settings-' + role);
+  const cfg = FIELDS[role];
+  cfg.texts.forEach(id => { document.getElementById(id).value = ''; });
+  cfg.selects.forEach(id => { document.getElementById(id).selectedIndex = 0; });
+  cfg.checks.forEach(id => {
+    // Reset to HTML default
+    const el = document.getElementById(id);
+    el.checked = el.hasAttribute('data-default') ? el.getAttribute('data-default') === 'true' : false;
+  });
+  cfg.tags.forEach(id => {
+    document.getElementById(id).querySelectorAll('.tag').forEach(t => t.remove());
+  });
+  showToast('設定をリセットしました');
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg || '設定を保存しました';
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// Load all on page load
+['engineer', 'designer', 'management'].forEach(loadPanel);
+</script>
+</body>
+</html>
